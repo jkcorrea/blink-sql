@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent overscroll bounce */
+html, body {
+  overscroll-behavior: none;
+}
+
+.right-shadow {
+  &:after {
+    content: " ";
+    height: 104%;
+    position: absolute;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 80%);
+    top: 0;
+    width: 5px;
+    right: -5px;
+    z-index: 1;
+    clip-path: inset(-100vw -100vw -100vw 0);
+    filter: blur(4px);
+  }
+}

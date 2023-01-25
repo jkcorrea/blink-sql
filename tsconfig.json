@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "jsxImportSource": "solid-js",
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "strict": true,
+    "types": ["vite/client", "solid-start/env", "unplugin-icons/types/solid",],
+    "noEmit": true,
+    "isolatedModules": true,
+    "allowUnusedLabels": true,
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}
