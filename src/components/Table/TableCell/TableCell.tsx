@@ -18,8 +18,9 @@ interface Props<TData = any> {
 
 export const TableCell = (props: Props) => {
   const { cell, isPinned, isReadonly, width, height, left } = $destructure(props)
-  const [{ selectedCell, rowHeight }, { setSelectedCell }] = useTable()
-  $(() => console.log(selectedCell?.id))
+  const [tableState, { setSelectedCell }] = useTable()
+  const { selectedCell, rowHeight } = $destructure(tableState)
+
   const isSelected = $selector(selectedCell?.id)
   const isFocused = $(Boolean(isSelected(cell.id) && selectedCell?.isFocused))
 

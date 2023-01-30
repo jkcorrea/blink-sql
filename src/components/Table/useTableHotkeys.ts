@@ -20,21 +20,22 @@ const VALID_KEYS = new Set([...SINGLE_PRESS_KEYS, ...MULTI_PRESS_KEYS] as const)
  * @param table The react-table instance. Used to reference columns/rows.
  */
 const useTableHotkeys = ({ disabled, rows, rowsById, leafColumns }: Props) => {
-  const [{ selectedCell }, { setSelectedCell }] = useTable()
+  const [state, { setSelectedCell }] = useTable()
+
   const clear = makeEventListener(window, 'keydown', (ev) => {
     const key = ev.key.toUpperCase()
-    if (disabled || !VALID_KEYS.has(key as any) || !selectedCell) return
+    if (disabled || !VALID_KEYS.has(key as any) || !state.selectedCell) return
     ev.preventDefault()
 
-    if ((key === 'ESCAPE' || key === 'TAB') && selectedCell.isFocused) {
-      setSelectedCell({ ...selectedCell, isFocused: false })
+    if ((key === 'ESCAPE' || key === 'TAB') && state.selectedCell.isFocused) {
+      setSelectedCell({ ...state.selectedCell, isFocused: false })
       return
-    } else if (key === 'ENTER' && !selectedCell.isFocused) {
-      setSelectedCell({ ...selectedCell, isFocused: true })
+    } else if (key === 'ENTER' && !state.selectedCell.isFocused) {
+      setSelectedCell({ ...state.selectedCell, isFocused: true })
       return
     }
 
-    const cellId = selectedCell.id
+    const cellId = state.selectedCell.id
     // HACK: tansatck table defines a cellId as `${row.id}_${col.id}`
     const [rowIdStr, ...colIdParts] = cellId.split('_')
     let rowId = parseInt(rowIdStr, 10)
@@ -43,7 +44,7 @@ const useTableHotkeys = ({ disabled, rows, rowsById, leafColumns }: Props) => {
     const colIdx = leafColumns.findIndex((c) => c.id === colId)
 
     if (rowIdx === -1 || colIdx === -1) {
-      console.warn('Could not find row/col for cell', selectedCell)
+      console.warn('Could not find row/col for cell', state.selectedCell)
       return
     }
 

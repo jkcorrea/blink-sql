@@ -8,11 +8,6 @@ export default defineConfig({
   plugins: [
     devtools({
       autoname: true,
-      locator: {
-        targetIDE: 'vscode',
-        componentLocation: true,
-        jsxLocation: true,
-      },
     }),
     solidStart({
       ssr: false,

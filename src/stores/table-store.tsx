@@ -1,6 +1,8 @@
+import { createContextProvider } from '@solid-primitives/context'
 import { capitalCase } from 'change-case'
 import { sortBy } from 'rambda'
-import { createContext, createMemo, ParentComponent, useContext } from 'solid-js'
+import { createContext, createMemo } from 'solid-js'
+import { createStore } from 'solid-js/store'
 
 import { ColumnConfig, SelectedCell } from '~/components/Table/types'
 import { DEFAULT_ROW_HEIGHT, FieldType } from '~/constants'
@@ -47,11 +49,11 @@ export type TableContextValue = [state: TableState, actions: TableActions]
 
 export const TableContext = createContext<TableContextValue>()
 
-export const TableProvider: ParentComponent = (props) => {
+function createTableStore() {
   // eslint-disable-next-line prefer-const
   let getOrderedColumns: () => ColumnConfig[]
 
-  const [state, setState] = $store<TableState>({
+  const [state, setState] = createStore<TableState>({
     columns,
     selectedCell: null,
     rowHeight: DEFAULT_ROW_HEIGHT,
@@ -105,7 +107,11 @@ export const TableProvider: ParentComponent = (props) => {
     },
   }
 
-  return <TableContext.Provider value={[state, actions]}>{props.children}</TableContext.Provider>
+  const value = $([state, actions] as const)
+  return value
 }
 
-export const useTable = () => useContext(TableContext)!
+const [TableProvider, _useTable] = createContextProvider(createTableStore)
+const useTable = () => _useTable()!
+
+export { TableProvider, useTable }

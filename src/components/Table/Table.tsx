@@ -31,7 +31,8 @@ const colHelper = createColumnHelper<any>()
 export function Table(props: TableProps) {
   const { data, isLoading } = $destructure(props)
   // Grab columns from store & filter/transform them into React Table columns
-  const [{ columnsOrdered, hiddenColumns }] = useTable()
+  const [tableState] = useTable()
+  const { columnsOrdered, hiddenColumns } = $destructure(tableState)
 
   const columns = $(
     columnsOrdered

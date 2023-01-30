@@ -23,7 +23,7 @@ export function useVirtualTable(props: UseVirtualProps) {
     'containerRef',
     'leafColumns',
   ])
-  const [{ rowHeight, selectedCell }] = useTable()
+  const [tableState] = useTable()
 
   // Virtualize rows
   const {
@@ -35,7 +35,7 @@ export function useVirtualTable(props: UseVirtualProps) {
     count: rows.length,
     overscan: 5,
     paddingEnd: TABLE_PADDING,
-    estimateSize: () => rowHeight,
+    estimateSize: () => tableState.rowHeight,
     // useCallback(
     //   (index: number) => rowHeight + (rows[index]._rowy_outOfOrder ? OUT_OF_ORDER_MARGIN : 0),
     //   [rows, rowHeight],
@@ -77,8 +77,8 @@ export function useVirtualTable(props: UseVirtualProps) {
 
   // Scroll to selected cell
   createEffect(() => {
-    if (!selectedCell) return
-    const { rowId, colId } = splitCellId(selectedCell.id)
+    if (!tableState.selectedCell) return
+    const { rowId, colId } = splitCellId(tableState.selectedCell.id)
     const rowIdx = rows.findIndex((row) => row.id === rowId)
     const colIdx = leafColumns.findIndex((col) => col.id === colId)
     if (rowIdx > -1) scrollToRowIndex(rowIdx)

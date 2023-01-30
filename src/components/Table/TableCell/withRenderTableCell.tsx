@@ -83,9 +83,9 @@ export function withRenderTableCell(
 ) {
   function RenderedTableCell(props: IRenderedTableCellProps) {
     const { row: _row, cell, column, value, isFocused, setIsFocused, disabled, rowHeight } = $destructure(props)
-    const [{ dirtyFields }, { setDirtyField, clearDirtyField }] = useTable()
-    const isDirty = $(cell.id in dirtyFields)
-    const displayValue = $(isDirty ? dirtyFields[cell.id] : value)
+    const [tableState, { setDirtyField, clearDirtyField }] = useTable()
+    const isDirty = $(cell.id in tableState.dirtyFields)
+    const displayValue = $(isDirty ? tableState.dirtyFields[cell.id] : value)
     // Store a ref to the parent of this cell, which is where we attach the popover to
     let containerRef = $signal<HTMLElement | null>(null)
     let popoverRef = $signal<HTMLElement>()

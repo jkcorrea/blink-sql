@@ -17,7 +17,7 @@ export interface TableBodyProps {
 }
 
 export function TableBody(props: TableBodyProps) {
-  const [{ rowHeight }] = useTable()
+  const [tableState] = useTable()
   const { rows, columnSizing, containerRef, leafColumns } = $destructure(props)
   const { getVirtualRows, getVirtualCols, getPadding } = useVirtualTable({
     rows,
@@ -45,7 +45,7 @@ export function TableBody(props: TableBodyProps) {
               role="row"
               class={tw('group relative flex', row.getIsSelected() && 'active')}
               style={{
-                height: `${rowHeight}px`,
+                height: `${tableState.rowHeight}px`,
                 'margin-bottom': `${outOfOrder ? OUT_OF_ORDER_MARGIN : 0}px`,
                 'padding-left': `${padding.left}px`,
                 'padding-right': `${padding.right}px`,
@@ -59,7 +59,7 @@ export function TableBody(props: TableBodyProps) {
                     <TableCell
                       cell={cell}
                       width={cell.column.getSize()}
-                      height={rowHeight}
+                      height={tableState.rowHeight}
                       left={vCell.start}
                       isPinned={!!cell.getContext().column.getIsPinned()}
                     />
