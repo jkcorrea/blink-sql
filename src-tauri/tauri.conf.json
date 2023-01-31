@@ -11,13 +11,21 @@
     "version": "0.0.0"
   },
   "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      }
-    },
+    "macOSPrivateApi": true,
+		"allowlist": {
+			"all": true,
+			"protocol": {
+				"assetScope": ["*"]
+			},
+			"os": {
+				"all": true
+			},
+			"dialog": {
+				"all": true,
+				"open": true,
+				"save": true
+			}
+		},
     "bundle": {
       "active": true,
       "category": "DeveloperTool",

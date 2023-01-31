@@ -3,15 +3,26 @@
     windows_subsystem = "windows"
 )]
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+use tauri::Manager;
+
+#[cfg(target_os = "macos")]
+mod macos;
+
+mod api;
+
+#[tauri::command(async)]
+async fn app_ready(app_handle: tauri::AppHandle) {
+    let window = app_handle.get_window("main").unwrap();
+
+    window.show().unwrap();
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
+    let router = api::mount();
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .plugin(rspc::integrations::tauri::plugin(router, || ()))
+        .invoke_handler(tauri::generate_handler![app_ready])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
