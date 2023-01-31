@@ -2,7 +2,7 @@ import type { Column, ColumnSizingState, Row } from '@tanstack/solid-table'
 import { For } from 'solid-js'
 
 // import { TableServiceProvider, useTableService } from './TableService'
-import { OUT_OF_ORDER_MARGIN } from '~/constants'
+import { OUT_OF_ORDER_MARGIN } from '~/lib/constants'
 import { tw } from '~/lib/utils'
 import { useTable } from '~/stores'
 

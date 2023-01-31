@@ -1,16 +1,17 @@
 import solidLabels from 'babel-plugin-solid-labels'
-import devtools from 'solid-devtools/vite'
-import solidStart from 'solid-start/vite'
+// import devtools from 'solid-devtools/vite'
 import Icons from 'unplugin-icons/vite'
 import { defineConfig } from 'vite'
+import solid from 'vite-plugin-solid'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   plugins: [
-    devtools({
-      autoname: true,
-    }),
-    solidStart({
-      ssr: false,
+    // devtools({
+    //   autoname: true,
+    // }),
+    tsconfigPaths(),
+    solid({
       babel: {
         plugins: [[solidLabels, { dev: process.env.NODE_ENV !== 'production' }]],
       },

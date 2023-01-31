@@ -1,6 +1,6 @@
 import { Cell, flexRender } from '@tanstack/solid-table'
 
-import { TABLE_PADDING } from '~/constants'
+import { TABLE_PADDING } from '~/lib/constants'
 import { tw } from '~/lib/utils'
 import { useTable } from '~/stores'
 

@@ -6,7 +6,7 @@ import {
   VisibilityState,
 } from '@tanstack/solid-table'
 
-import { MIN_COL_WIDTH } from '~/constants'
+import { MIN_COL_WIDTH } from '~/lib/constants'
 import { useTable } from '~/stores'
 
 import { getFieldProp, getFieldType } from '../fields'

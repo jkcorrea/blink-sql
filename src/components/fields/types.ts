@@ -1,6 +1,6 @@
 import { JSX, ParentComponent } from 'solid-js'
 
-import { FieldType } from '~/constants'
+import { FieldType } from '~/lib/constants'
 
 import { IContextMenuItem } from '../Table/ContextMenu/ContextMenuItem'
 import { IRenderedTableCellProps } from '../Table/TableCell/withRenderTableCell'

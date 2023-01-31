@@ -1,4 +1,4 @@
-import type { FieldType } from '~/constants'
+import type { FieldType } from '~/lib/constants'
 
 /**
  * Represents a selected cell in the table

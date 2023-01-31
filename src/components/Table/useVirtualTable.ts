@@ -3,7 +3,7 @@ import { createVirtualizer } from '@tanstack/solid-virtual'
 import { defaultRangeExtractor } from '@tanstack/virtual-core'
 import { createEffect, createMemo, splitProps } from 'solid-js'
 
-import { DEFAULT_COL_WIDTH, MIN_COL_WIDTH, TABLE_PADDING } from '~/constants'
+import { DEFAULT_COL_WIDTH, MIN_COL_WIDTH, TABLE_PADDING } from '~/lib/constants'
 import { useTable } from '~/stores'
 
 import { splitCellId } from './utils'

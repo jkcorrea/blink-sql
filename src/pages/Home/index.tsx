@@ -1,16 +1,19 @@
+import { A } from '@solidjs/router'
 import { capitalCase } from 'change-case'
 import { For } from 'solid-js'
-import { A } from 'solid-start'
 
 import { Table } from '~/components/Table'
 import { Topbar } from '~/components/Topbar'
 import { TableProvider } from '~/stores'
 
-import data from '~/constants/data.json'
+import data from '~/lib/constants/data.json'
 
 const tables = ['users', 'posts', 'comments']
 
 export default function Home() {
+  // const res = rspc.createQuery(() => ['version'])
+  // console.log(res.data)
+
   return (
     <main class="relative flex h-screen w-screen flex-col overflow-hidden">
       <Topbar projectName="Project" />

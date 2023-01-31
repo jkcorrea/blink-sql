@@ -5,9 +5,9 @@ import { createContext, createMemo } from 'solid-js'
 import { createStore } from 'solid-js/store'
 
 import { ColumnConfig, SelectedCell } from '~/components/Table/types'
-import { DEFAULT_ROW_HEIGHT, FieldType } from '~/constants'
+import { DEFAULT_ROW_HEIGHT, FieldType } from '~/lib/constants'
 
-import data from '~/constants/data.json'
+import data from '~/lib/constants/data.json'
 
 const columns = Object.keys(data[0]).reduce(
   (obj, id, index) => ({

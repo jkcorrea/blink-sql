@@ -1,7 +1,7 @@
 import { flexRender, Table } from '@tanstack/solid-table'
 import { For } from 'solid-js'
 
-import { DEFAULT_ROW_HEIGHT } from '~/constants'
+import { DEFAULT_ROW_HEIGHT } from '~/lib/constants'
 import { tw } from '~/lib/utils'
 
 type Props = {
