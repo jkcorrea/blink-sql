@@ -1,18 +1,35 @@
 import { A } from '@solidjs/router'
+import { Command } from '@tauri-apps/api/shell'
 import { capitalCase } from 'change-case'
-import { For } from 'solid-js'
+import { createResource, For } from 'solid-js'
 
 import { Table } from '~/components/Table'
 import { Topbar } from '~/components/Topbar'
 import { TableProvider } from '~/stores'
 
-import data from '~/lib/constants/data.json'
-
 const tables = ['users', 'posts', 'comments']
 
+async function fetchData() {
+  let rows: any[] = []
+  try {
+    const sql = Command.sidecar('binaries/usql/usql', [
+      '-J',
+      '-q',
+      '-c',
+      'SELECT * from thing',
+      'postgresql://postgres:postgres@localhost:54322/postgres?sslmode=disable',
+    ])
+    const res = await sql.execute()
+    rows = JSON.parse(res.stdout)
+  } catch (error) {
+    console.log(error)
+  }
+
+  return rows
+}
+
 export default function Home() {
-  // const res = rspc.createQuery(() => ['version'])
-  // console.log(res.data)
+  const [data] = createResource(fetchData)
 
   return (
     <main class="relative flex h-screen w-screen flex-col overflow-hidden">
@@ -36,7 +53,7 @@ export default function Home() {
 
         {/* Main content */}
         <TableProvider>
-          <Table data={data} />
+          <Table data={data} isLoading={data.loading} />
         </TableProvider>
       </div>
     </main>
