@@ -5,6 +5,7 @@ import {
   getCoreRowModel,
   VisibilityState,
 } from '@tanstack/solid-table'
+import { createEffect } from 'solid-js'
 
 import { MIN_COL_WIDTH } from '~/lib/constants'
 import { useTable } from '~/stores'
@@ -23,13 +24,13 @@ declare module '@tanstack/solid-table' {
 }
 
 interface TableProps {
-  data: any[]
+  data: Accessor<any[] | undefined>
   isLoading?: boolean
 }
 const colHelper = createColumnHelper<any>()
 
 export function Table(props: TableProps) {
-  const { data, isLoading } = $destructure(props)
+  const { data: _data, isLoading } = $destructure(props)
   // Grab columns from store & filter/transform them into React Table columns
   const [tableState] = useTable()
   const { columnsOrdered, hiddenColumns } = $destructure(tableState)
@@ -49,13 +50,16 @@ export function Table(props: TableProps) {
       ),
   )
 
-  const table = createSolidTable<any>({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,
-    columnResizeMode: 'onChange',
-  })
+  const data = $(_data() ?? [])
+  const table = $(
+    createSolidTable<any>({
+      data,
+      columns,
+      getCoreRowModel: getCoreRowModel(),
+      manualSorting: true,
+      columnResizeMode: 'onChange',
+    }),
+  )
 
   // Get user’s hidden columns from props and memoize into a `VisibilityState`
   const columnVisibility = $<VisibilityState>(
@@ -84,12 +88,14 @@ export function Table(props: TableProps) {
     }))
   })
 
-  const { rows, rowsById } = table.getRowModel()
+  const { rows, rowsById } = $destructure(table.getRowModel())
   const leafColumns = $(table.getVisibleLeafColumns())
 
   let containerRef = $signal<HTMLDivElement>()
 
-  useTableHotkeys({ rows, rowsById, leafColumns })
+  createEffect(() => {
+    useTableHotkeys({ rows, rowsById, leafColumns })
+  })
 
   const showSpinner = $(isLoading || data === null)
 

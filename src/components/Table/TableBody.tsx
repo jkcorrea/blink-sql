@@ -1,5 +1,5 @@
 import type { Column, ColumnSizingState, Row } from '@tanstack/solid-table'
-import { For } from 'solid-js'
+import { createMemo, For } from 'solid-js'
 
 // import { TableServiceProvider, useTableService } from './TableService'
 import { OUT_OF_ORDER_MARGIN } from '~/lib/constants'
@@ -19,22 +19,24 @@ export interface TableBodyProps {
 export function TableBody(props: TableBodyProps) {
   const [tableState] = useTable()
   const { rows, columnSizing, containerRef, leafColumns } = $destructure(props)
-  const { getVirtualRows, getVirtualCols, getPadding } = useVirtualTable({
-    rows,
-    containerRef,
-    leafColumns,
-    columnSizing,
-  })
+  const virtual = createMemo(() =>
+    useVirtualTable({
+      rows,
+      containerRef,
+      leafColumns,
+      columnSizing,
+    }),
+  )
 
-  const virtualRows = $derefMemo(getVirtualRows)
-  const virtualCols = $derefMemo(getVirtualCols)
-  const padding = $derefMemo(getPadding)
+  const virtualRows = createMemo(() => virtual().getVirtualRows())
+  const virtualCols = createMemo(() => virtual().getVirtualCols())
+  const padding = createMemo(() => virtual().getPadding())
 
   return (
     <tbody>
-      {padding.top > 0 && <div role="presentation" style={{ height: `${padding.top}px` }} />}
+      {padding().top > 0 && <div role="presentation" style={{ height: `${padding().top}px` }} />}
 
-      <For each={virtualRows}>
+      <For each={virtualRows()}>
         {(vRow) => {
           const row = $(rows[vRow.index])
           const outOfOrder = false // TODO do we need this logic
@@ -47,11 +49,11 @@ export function TableBody(props: TableBodyProps) {
               style={{
                 height: `${tableState.rowHeight}px`,
                 'margin-bottom': `${outOfOrder ? OUT_OF_ORDER_MARGIN : 0}px`,
-                'padding-left': `${padding.left}px`,
-                'padding-right': `${padding.right}px`,
+                'padding-left': `${padding().left}px`,
+                'padding-right': `${padding().right}px`,
               }}
             >
-              <For each={virtualCols}>
+              <For each={virtualCols()}>
                 {(vCell) => {
                   const cell = $(rowCells[vCell.index])
 
@@ -71,7 +73,7 @@ export function TableBody(props: TableBodyProps) {
         }}
       </For>
 
-      {padding.bottom > 0 && <div role="presentation" style={{ height: `${padding.bottom}px` }} />}
+      {padding().bottom > 0 && <div role="presentation" style={{ height: `${padding().bottom}px` }} />}
     </tbody>
   )
 }

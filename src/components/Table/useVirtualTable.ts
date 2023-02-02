@@ -17,13 +17,13 @@ interface UseVirtualProps {
 
 /** Virtualizes the table rows and columns with TanStack's react-virtual */
 export function useVirtualTable(props: UseVirtualProps) {
+  const [tableState] = useTable()
   const [{ rows, columnSizing, containerRef, leafColumns }, _] = splitProps(props, [
     'rows',
     'columnSizing',
     'containerRef',
     'leafColumns',
   ])
-  const [tableState] = useTable()
 
   // Virtualize rows
   const {
@@ -32,7 +32,9 @@ export function useVirtualTable(props: UseVirtualProps) {
     scrollToIndex: scrollToRowIndex,
   } = createVirtualizer({
     getScrollElement: () => containerRef,
-    count: rows.length,
+    get count() {
+      return rows.length
+    },
     overscan: 5,
     paddingEnd: TABLE_PADDING,
     estimateSize: () => tableState.rowHeight,
@@ -50,7 +52,9 @@ export function useVirtualTable(props: UseVirtualProps) {
   } = createVirtualizer({
     getScrollElement: () => containerRef,
     horizontal: true,
-    count: leafColumns.length,
+    get count() {
+      return leafColumns.length
+    },
     overscan: 5,
     paddingStart: TABLE_PADDING,
     paddingEnd: TABLE_PADDING,
