@@ -9,17 +9,17 @@ import { createEffect } from 'solid-js'
 
 import { MIN_COL_WIDTH } from '~/lib/constants'
 import { useTable } from '~/stores'
+import { Column } from '~/stores/database-store/types'
 
 import { getFieldProp, getFieldType } from '../fields'
 import { Spinner } from '../Spinner'
 import { TableBody } from './TableBody'
 import { TableHeader } from './TableHeader'
-import { ColumnConfig } from './types'
 import useTableHotkeys from './useTableHotkeys'
 
 declare module '@tanstack/solid-table' {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  interface ColumnMeta<TData, TValue> extends ColumnConfig {}
+  interface ColumnMeta<TData, TValue> extends Column {}
   export interface ResourceTableProps {}
 }
 
@@ -37,13 +37,13 @@ export function Table(props: TableProps) {
 
   const columns = $(
     columnsOrdered
-      .filter((cfg) => !cfg.isHidden)
+      .filter((cfg) => !cfg.userConfig?.isHidden)
       .map((cfg) =>
-        colHelper.accessor(cfg.fieldName, {
-          id: cfg.fieldName,
+        colHelper.accessor(cfg.name, {
+          id: cfg.id,
           meta: cfg,
-          size: cfg.width,
-          enableResizing: cfg.isResizable !== false,
+          size: cfg.userConfig?.width,
+          enableResizing: cfg.userConfig?.isResizable !== false,
           minSize: MIN_COL_WIDTH,
           cell: getFieldProp('TableCell', getFieldType(cfg)),
         }),
@@ -68,7 +68,9 @@ export function Table(props: TableProps) {
 
   // Get frozen columns and memoize into a `ColumnPinningState`
   const columnPinning = $<ColumnPinningState>({
-    left: columns.filter((c) => c.meta?.isPinned && c.id && columnVisibility[c.id] !== false).map((c) => c.id!),
+    left: columns
+      .filter((c) => c.meta?.userConfig?.isPinned && c.id && columnVisibility[c.id] !== false)
+      .map((c) => c.id!),
   })
 
   // const lastFrozen: string | undefined = columnPinning.left![columnPinning.left!.length - 1]

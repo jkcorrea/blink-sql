@@ -1,8 +1,8 @@
 import { find, prop, propEq } from 'rambda'
 
 import { FieldType } from '~/lib/constants'
+import { Column } from '~/stores/database-store/types'
 
-import { ColumnConfig } from '../Table/types'
 // Import field configs
 import Text from './Text'
 // // import Aggregate from "./Aggregate";
@@ -96,6 +96,7 @@ export const hasDataTypes = (dataTypes: string[]) => {
  * @param column - The column to check
  * @returns FieldType
  */
-export const getFieldType = (column: Pick<ColumnConfig, 'type' | 'config'> & Partial<ColumnConfig>) => column.type
+export const getFieldType = (column: Pick<Column, 'type' | 'userConfig'> & Partial<Column>) =>
+  column.userConfig?.displayType || column.type
 // TODO derivative?
 // column.type === FieldType.derivative ? column.config?.renderFieldType : column.type

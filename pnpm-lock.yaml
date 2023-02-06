@@ -20,6 +20,7 @@ specifiers:
   '@tanstack/virtual-core': 3.0.0-alpha.1
   '@tauri-apps/api': ^1.2.0
   '@tauri-apps/cli': ^1.2.2
+  '@types/babel__core': ^7.20.0
   '@types/node': ^18.7.10
   '@typescript-eslint/eslint-plugin': ^5.46.0
   '@typescript-eslint/parser': ^5.46.0
@@ -42,6 +43,7 @@ specifiers:
   rambda: ^7.4.0
   solid-js: ^1.4.7
   solid-tippy: ^0.2.0
+  sql-bricks: ^3.0.0
   tailwind-merge: ^1.8.1
   tailwindcss: ^3.2.4
   tippy.js: ^6.3.7
@@ -51,6 +53,7 @@ specifiers:
   vite: ^4.0.0
   vite-plugin-solid: ^2.5.0
   vite-tsconfig-paths: ^4.0.5
+  zod: ^3.20.2
 
 dependencies:
   '@rspc/client': 0.1.2
@@ -74,15 +77,18 @@ dependencies:
   rambda: 7.4.0
   solid-js: 1.6.9
   solid-tippy: 0.2.0_anctiafxjxpeedt2oj26bjngr4
+  sql-bricks: 3.0.0
   tailwind-merge: 1.8.1
   tippy.js: 6.3.7
   undici: 5.16.0
   unplugin-icons: 0.15.1
+  zod: 3.20.2
 
 devDependencies:
   '@babel/core': 7.20.12
   '@iconify-json/tabler': 1.1.57
   '@tauri-apps/cli': 1.2.3
+  '@types/babel__core': 7.20.0
   '@types/node': 18.11.18
   '@typescript-eslint/eslint-plugin': 5.49.0_iu322prlnwsygkcra5kbpy22si
   '@typescript-eslint/parser': 5.49.0_7uibuqfxkfaozanbtbziikiqje
@@ -1045,6 +1051,35 @@ packages:
       '@tauri-apps/cli-linux-x64-musl': 1.2.3
       '@tauri-apps/cli-win32-ia32-msvc': 1.2.3
       '@tauri-apps/cli-win32-x64-msvc': 1.2.3
+    dev: true
+
+  /@types/babel__core/7.20.0:
+    resolution: {integrity: sha512-+n8dL/9GWblDO0iU6eZAwEIJVr5DWigtle+Q6HLOrh/pdbXOhOtqzq8VPPE2zvNJzSKY4vH/z3iT3tn0A3ypiQ==}
+    dependencies:
+      '@babel/parser': 7.20.13
+      '@babel/types': 7.20.7
+      '@types/babel__generator': 7.6.4
+      '@types/babel__template': 7.4.1
+      '@types/babel__traverse': 7.18.3
+    dev: true
+
+  /@types/babel__generator/7.6.4:
+    resolution: {integrity: sha512-tFkciB9j2K755yrTALxD44McOrk+gfpIpvC3sxHjRawj6PfnQxrse4Clq5y/Rq+G3mrBurMax/lG8Qn2t9mSsg==}
+    dependencies:
+      '@babel/types': 7.20.7
+    dev: true
+
+  /@types/babel__template/7.4.1:
+    resolution: {integrity: sha512-azBFKemX6kMg5Io+/rdGT0dkGreboUVR0Cdm3fz9QJWpaQGJRQXl7C+6hOTCZcMll7KFyEQpgbYI2lHdsS4U7g==}
+    dependencies:
+      '@babel/parser': 7.20.13
+      '@babel/types': 7.20.7
+    dev: true
+
+  /@types/babel__traverse/7.18.3:
+    resolution: {integrity: sha512-1kbcJ40lLB7MHsj39U4Sh1uTd2E7rLEa79kmDpI6cy+XiXsteB3POdQomoq4FxszMrO3ZYchkhYJw7A2862b3w==}
+    dependencies:
+      '@babel/types': 7.20.7
     dev: true
 
   /@types/json-schema/7.0.11:
@@ -3262,6 +3297,10 @@ packages:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
     engines: {node: '>=0.10.0'}
 
+  /sql-bricks/3.0.0:
+    resolution: {integrity: sha512-P9fXYWdPFOcU2uQr7hwzNa0m6qOjMSV6wmo3DPk1Nzxh9rZWyjgbFaRji41EMV1uHps4SCgwa+Cdv0tUJ+mySw==}
+    dev: false
+
   /stop-iteration-iterator/1.0.0:
     resolution: {integrity: sha512-iCGQj+0l0HOdZ2AEeBADlsRC+vsnDsZsbdSiH1yNSjcfKM7fdpCMfqAL/dwF5BLiw/XhRft/Wax6zQbhq2BcjQ==}
     engines: {node: '>= 0.4'}
@@ -3715,3 +3754,7 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  /zod/3.20.2:
+    resolution: {integrity: sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==}
+    dev: false

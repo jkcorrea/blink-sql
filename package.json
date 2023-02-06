@@ -33,15 +33,18 @@
     "rambda": "^7.4.0",
     "solid-js": "^1.4.7",
     "solid-tippy": "^0.2.0",
+    "sql-bricks": "^3.0.0",
     "tailwind-merge": "^1.8.1",
     "tippy.js": "^6.3.7",
     "undici": "^5.16.0",
-    "unplugin-icons": "^0.15.1"
+    "unplugin-icons": "^0.15.1",
+    "zod": "^3.20.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
     "@iconify-json/tabler": "^1.1.57",
     "@tauri-apps/cli": "^1.2.2",
+    "@types/babel__core": "^7.20.0",
     "@types/node": "^18.7.10",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "@typescript-eslint/parser": "^5.46.0",

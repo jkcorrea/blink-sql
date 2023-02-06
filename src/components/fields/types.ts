@@ -1,10 +1,11 @@
 import { JSX, ParentComponent } from 'solid-js'
 
 import { FieldType } from '~/lib/constants'
+import { Column } from '~/stores/database-store/types'
 
 import { IContextMenuItem } from '../Table/ContextMenu/ContextMenuItem'
 import { IRenderedTableCellProps } from '../Table/TableCell/withRenderTableCell'
-import type { ColumnConfig, SelectedCell } from '../Table'
+import type { SelectedCell } from '../Table'
 
 export { FieldType }
 
@@ -42,7 +43,7 @@ export interface IDisplayCellProps<T = any> {
   type: FieldType
   name: string
   // row: TableRow
-  column: ColumnConfig
+  column: Column
   /** The row’s _rowy_ref object */
   // _rowy_ref: TableRowRef
   disabled: boolean
@@ -69,7 +70,7 @@ export interface IEditorCellProps<T = any> extends IDisplayCellProps<T> {
 /** Props to be passed to all SideDrawerFields */
 export interface ISideDrawerFieldProps<T = any> {
   /** The column config */
-  column: ColumnConfig
+  column: Column
   /** The field’s local value – synced with db when field is not dirty */
   value: T
   /** Call when the user has input but changes have not been saved */

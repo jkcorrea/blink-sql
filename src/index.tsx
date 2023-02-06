@@ -5,6 +5,7 @@ import { ErrorBoundary, resetErrorBoundaries, Suspense } from 'solid-js'
 import { render } from 'solid-js/web'
 
 import { client, queryClient, rspc } from './lib/rspc'
+import { DatabaseProvider } from './stores/database-store'
 import { AppRouter } from './router'
 
 import './index.css'
@@ -27,7 +28,9 @@ function Root() {
   return (
     <Router>
       <rspc.Provider client={client} queryClient={queryClient}>
-        <App />
+        <DatabaseProvider databaseUrl="postgres://postgres:postgres@localhost:54322/postgres?sslmode=disable">
+          <App />
+        </DatabaseProvider>
       </rspc.Provider>
     </Router>
   )

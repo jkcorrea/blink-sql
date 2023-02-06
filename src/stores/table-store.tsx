@@ -1,11 +1,13 @@
 import { createContextProvider } from '@solid-primitives/context'
 import { capitalCase } from 'change-case'
 import { sortBy } from 'rambda'
-import { createContext, createMemo } from 'solid-js'
+import { createMemo } from 'solid-js'
 import { createStore } from 'solid-js/store'
 
-import { ColumnConfig, SelectedCell } from '~/components/Table/types'
+import { SelectedCell } from '~/components/Table/types'
 import { DEFAULT_ROW_HEIGHT, FieldType } from '~/lib/constants'
+
+import { Column } from './database-store/types'
 
 import data from '~/lib/constants/data.json'
 
@@ -21,23 +23,23 @@ const columns = Object.keys(data[0]).reduce(
       index,
     },
   }),
-  {} as Record<string, ColumnConfig>,
+  {} as Record<string, Column>,
 )
 
-export interface TableState {
-  columns: Record<string, ColumnConfig>
-  readonly columnsOrdered: ColumnConfig[]
+interface TableState {
+  columns: Record<string, Column>
+  readonly columnsOrdered: Column[]
   /** The currently selected cell in format: `rowId_columnId` */
   selectedCell: SelectedCell | null | undefined
   rowHeight: number
   dirtyFields: Record<string, any>
-  hiddenColumns: ColumnConfig['id'][]
+  hiddenColumns: Column['id'][]
 }
 
-export interface TableActions {
-  addColumn: (column: ColumnConfig) => void
-  updateColumn: (id: ColumnConfig['id'], column: Partial<Omit<ColumnConfig, 'id'>>) => void
-  removeColumn: (id: ColumnConfig['id']) => void
+interface TableActions {
+  addColumn: (column: Column) => void
+  updateColumn: (id: Column['id'], column: Partial<Omit<Column, 'id'>>) => void
+  removeColumn: (id: Column['id']) => void
   setSelectedCell: (cell?: SelectedCell | null) => void
   setRowHeight: (height: number) => void
   setDirtyField: (id: string, value: any) => void
@@ -45,13 +47,9 @@ export interface TableActions {
   clearAllDirtyFields: () => void
 }
 
-export type TableContextValue = [state: TableState, actions: TableActions]
-
-export const TableContext = createContext<TableContextValue>()
-
 function createTableStore() {
   // eslint-disable-next-line prefer-const
-  let getOrderedColumns: () => ColumnConfig[]
+  let getOrderedColumns: () => Column[]
 
   const [state, setState] = createStore<TableState>({
     columns,
@@ -66,10 +64,10 @@ function createTableStore() {
 
   // eslint-disable-next-line solid/reactivity
   getOrderedColumns = createMemo(() => {
-    const cols = Object.values<ColumnConfig>(state.columns)
+    const cols = Object.values<Column>(state.columns)
     return sortBy(
       // If not fixed, bump it by cols.length to make sure it comes after all fixed cols
-      ({ isPinned, index }) => (isPinned ? index : cols.length + index),
+      ({ userConfig, index }) => (userConfig?.isPinned ? index : cols.length + index),
       cols,
     )
   })
@@ -113,5 +111,4 @@ function createTableStore() {
 
 const [TableProvider, _useTable] = createContextProvider(createTableStore)
 const useTable = () => _useTable()!
-
 export { TableProvider, useTable }
