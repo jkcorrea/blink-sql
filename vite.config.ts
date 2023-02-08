@@ -1,8 +1,6 @@
-import solidLabels from 'babel-plugin-solid-labels'
-// import devtools from 'solid-devtools/vite'
+import preact from '@preact/preset-vite'
 import Icons from 'unplugin-icons/vite'
 import { defineConfig } from 'vite'
-import solid from 'vite-plugin-solid'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
@@ -10,14 +8,21 @@ export default defineConfig({
     // devtools({
     //   autoname: true,
     // }),
+    preact(),
     tsconfigPaths(),
-    solid({
-      babel: {
-        plugins: [[solidLabels, { dev: process.env.NODE_ENV !== 'production' }]],
-      },
-    }),
-    Icons({ compiler: 'solid' }),
+    Icons({ compiler: 'jsx', jsx: 'preact' }),
   ],
+
+  resolve: {
+    alias: {
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+    },
+  },
+
+  optimizeDeps: {
+    include: ['preact/devtools', 'preact/debug', 'preact/jsx-dev-runtime'],
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   // prevent vite from obscuring rust errors

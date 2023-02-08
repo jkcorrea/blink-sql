@@ -1,6 +1,6 @@
 import { TextInput } from '~/components/inputs'
 
-import { ISettingsProps } from '../types'
+import type { ISettingsProps } from '../types'
 
 export default function Settings(props: ISettingsProps) {
   return (

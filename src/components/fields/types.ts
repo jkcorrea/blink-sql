@@ -1,11 +1,10 @@
-import { JSX, ParentComponent } from 'solid-js'
+import type { FunctionComponent, JSX } from 'preact'
 
 import { FieldType } from '~/lib/constants'
-import { Column } from '~/stores/database-store/types'
+import type { Column, SelectedCell } from '~/types/project'
 
-import { IContextMenuItem } from '../Table/ContextMenu/ContextMenuItem'
-import { IRenderedTableCellProps } from '../Table/TableCell/withRenderTableCell'
-import type { SelectedCell } from '../Table'
+import type { IContextMenuItem } from '../Table/ContextMenu/ContextMenuItem'
+import type { IRenderedTableCellProps } from '../Table/TableCell/withRenderTableCell'
 
 export { FieldType }
 
@@ -21,8 +20,8 @@ export interface IFieldConfig {
   description?: string
   setupGuideLink?: string
   contextMenuActions?: (selectedCell: SelectedCell, reset: () => void) => IContextMenuItem[]
-  TableCell: ParentComponent<IRenderedTableCellProps>
-  SideDrawerField: ParentComponent<ISideDrawerFieldProps>
+  TableCell: FunctionComponent<IRenderedTableCellProps>
+  SideDrawerField: FunctionComponent<ISideDrawerFieldProps>
   // settings?: React.ComponentType<ISettingsProps>
   // settingsValidator?: (config: Record<string, any>) => Record<string, string>
   // filter?: {
@@ -87,7 +86,7 @@ export interface ISettingsProps {
   onChange: (key: string) => (value: any) => void
   config: Record<string, any>
   fieldName: string
-  onBlur: JSX.EventHandlerUnion<HTMLInputElement | HTMLTextAreaElement, FocusEvent>
+  onBlur: JSX.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>
   errors: Record<string, any>
 }
 

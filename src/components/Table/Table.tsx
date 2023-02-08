@@ -1,15 +1,10 @@
-import {
-  ColumnPinningState,
-  createColumnHelper,
-  createSolidTable,
-  getCoreRowModel,
-  VisibilityState,
-} from '@tanstack/solid-table'
-import { createEffect } from 'solid-js'
+import type { ColumnPinningState, VisibilityState } from '@tanstack/react-table'
+import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 
 import { MIN_COL_WIDTH } from '~/lib/constants'
-import { useTable } from '~/stores'
-import { Column } from '~/stores/database-store/types'
+import { useTableStore } from '~/stores/table-store'
+import type { Column } from '~/types/project'
 
 import { getFieldProp, getFieldType } from '../fields'
 import { Spinner } from '../Spinner'
@@ -17,26 +12,25 @@ import { TableBody } from './TableBody'
 import { TableHeader } from './TableHeader'
 import useTableHotkeys from './useTableHotkeys'
 
-declare module '@tanstack/solid-table' {
+declare module '@tanstack/react-table' {
   // eslint-disable-next-line unused-imports/no-unused-vars
   interface ColumnMeta<TData, TValue> extends Column {}
   export interface ResourceTableProps {}
 }
 
 interface TableProps {
-  data: Accessor<any[] | undefined>
+  columns: Record<string, Column>
+  data: any[] | null
   isLoading?: boolean
 }
 const colHelper = createColumnHelper<any>()
 
-export function Table(props: TableProps) {
-  const { data: _data, isLoading } = $destructure(props)
+export function Table({ columns: _cols, data, isLoading }: TableProps) {
   // Grab columns from store & filter/transform them into React Table columns
-  const [tableState] = useTable()
-  const { columnsOrdered, hiddenColumns } = $destructure(tableState)
-
-  const columns = $(
-    columnsOrdered
+  const { hiddenColumns, columns } = useTableStore(({ hiddenColumns }) => ({
+    hiddenColumns,
+    columns: Object.values(_cols)
+      // TODO hiddenColumn/isHidden state is in two different places
       .filter((cfg) => !cfg.userConfig?.isHidden)
       .map((cfg) =>
         colHelper.accessor(cfg.name, {
@@ -48,62 +42,58 @@ export function Table(props: TableProps) {
           cell: getFieldProp('TableCell', getFieldType(cfg)),
         }),
       ),
-  )
+  }))
 
-  const data = $(_data() ?? [])
-  const table = $(
-    createSolidTable<any>({
-      data,
-      columns,
-      getCoreRowModel: getCoreRowModel(),
-      manualSorting: true,
-      columnResizeMode: 'onChange',
-    }),
-  )
+  const table = useReactTable({
+    data: data ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,
+    columnResizeMode: 'onChange',
+  })
 
   // Get user’s hidden columns from props and memoize into a `VisibilityState`
-  const columnVisibility = $<VisibilityState>(
-    Array.isArray(hiddenColumns) ? hiddenColumns.reduce((a, c) => ({ ...a, [c]: false }), {}) : {},
+  const columnVisibility: VisibilityState = useMemo(
+    () => (Array.isArray(hiddenColumns) ? hiddenColumns.reduce((a, c) => ({ ...a, [c]: false }), {}) : {}),
+    [hiddenColumns],
   )
 
   // Get frozen columns and memoize into a `ColumnPinningState`
-  const columnPinning = $<ColumnPinningState>({
-    left: columns
-      .filter((c) => c.meta?.userConfig?.isPinned && c.id && columnVisibility[c.id] !== false)
-      .map((c) => c.id!),
-  })
-
+  const columnPinning: ColumnPinningState = useMemo(
+    () => ({
+      left: columns
+        .filter((c) => c.meta?.userConfig?.isPinned && c.id && columnVisibility[c.id] !== false)
+        .map((c) => c.id!),
+    }),
+    [columns, columnVisibility],
+  )
   // const lastFrozen: string | undefined = columnPinning.left![columnPinning.left!.length - 1]
   // Track changes in column sizes
-  let columnSizing = $signal(table.initialState.columnSizing)
-  $mount(() => {
+  const [columnSizing, setColumnSizing] = useState(table.initialState.columnSizing)
+  useEffect(() => {
     table.setOptions((prev) => ({
       ...prev,
-      state: {
-        ...prev.state,
-        columnVisibility,
-        columnPinning,
-        columnSizing,
-      },
-      onColumnSizingChange: (newSizing) =>
-        (columnSizing = typeof newSizing === 'function' ? newSizing(columnSizing) : newSizing),
+      state: { ...prev.state, columnVisibility, columnPinning, columnSizing },
+      onColumnSizingChange: setColumnSizing,
     }))
-  })
+  }, [columnVisibility, columnPinning, columnSizing, table, setColumnSizing])
 
-  const { rows, rowsById } = $destructure(table.getRowModel())
-  const leafColumns = $(table.getVisibleLeafColumns())
+  // Attach hotkey listeners
+  const { rows, rowsById } = table.getRowModel()
+  const leafColumns = table.getVisibleLeafColumns()
 
-  let containerRef = $signal<HTMLDivElement>()
+  useTableHotkeys({ rows, rowsById, leafColumns })
 
-  createEffect(() => {
-    useTableHotkeys({ rows, rowsById, leafColumns })
-  })
+  // Store a **state** and reference to the container element
+  // so the state can re-render `TableBody`, preventing virtualization
+  // not detecting scroll if the container element was initially `null`
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const showSpinner = $(isLoading || data === null)
+  const showSpinner = isLoading || data === null
 
   return (
-    <div ref={(el) => (containerRef = el)} class="relative h-full w-full overflow-auto overscroll-none">
-      <div
+    <div ref={containerRef} class="relative h-full w-full overflow-auto overscroll-none">
+      <table
         role="grid"
         class="border-separate border-spacing-0 select-none"
         style={{
@@ -112,7 +102,7 @@ export function Table(props: TableProps) {
       >
         <TableHeader table={table} />
         <TableBody rows={rows} leafColumns={leafColumns} columnSizing={columnSizing} containerRef={containerRef} />
-      </div>
+      </table>
 
       {showSpinner && <Spinner />}
     </div>

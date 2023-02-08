@@ -1,9 +1,24 @@
-import { Route, Routes } from '@solidjs/router'
-import { lazy } from 'solid-js'
+import { createBrowserRouter } from 'react-router-dom'
 
-export const AppRouter = () => (
-  <Routes>
-    <Route path="/" component={lazy(() => import('./pages/Home'))} />
-    <Route path="/*" component={lazy(() => import('./pages/404'))} />
-  </Routes>
-)
+import NotFound from './pages/404'
+import ProjectIndex, { loader as rootLoader } from './pages/project'
+import ProjectTable, { loader as projectTableLoader } from './pages/project/table'
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <ProjectIndex />,
+    loader: rootLoader,
+    children: [
+      {
+        path: 't/:tableName',
+        element: <ProjectTable />,
+        loader: projectTableLoader,
+      },
+    ],
+  },
+  {
+    path: '/*',
+    element: <NotFound />,
+  },
+])

@@ -1,79 +1,69 @@
-import type { Column, ColumnSizingState, Row } from '@tanstack/solid-table'
-import { createMemo, For } from 'solid-js'
+import type { Column, ColumnSizingState, Row } from '@tanstack/react-table'
 
 // import { TableServiceProvider, useTableService } from './TableService'
 import { OUT_OF_ORDER_MARGIN } from '~/lib/constants'
 import { tw } from '~/lib/utils'
-import { useTable } from '~/stores'
+import { useTableStore } from '~/stores/table-store'
 
 import { TableCell } from './TableCell'
 import { useVirtualTable } from './useVirtualTable'
 
 export interface TableBodyProps {
-  containerRef: HTMLDivElement | undefined
+  containerRef: React.RefObject<HTMLDivElement>
   leafColumns: Column<any, any>[]
   rows: Row<any>[]
   columnSizing: ColumnSizingState
 }
 
-export function TableBody(props: TableBodyProps) {
-  const [tableState] = useTable()
-  const { rows, columnSizing, containerRef, leafColumns } = $destructure(props)
-  const virtual = createMemo(() =>
-    useVirtualTable({
-      rows,
-      containerRef,
-      leafColumns,
-      columnSizing,
-    }),
-  )
-
-  const virtualRows = createMemo(() => virtual().getVirtualRows())
-  const virtualCols = createMemo(() => virtual().getVirtualCols())
-  const padding = createMemo(() => virtual().getPadding())
+export function TableBody({ rows, columnSizing, containerRef, leafColumns }: TableBodyProps) {
+  const rowHeight = useTableStore(({ rowHeight }) => rowHeight)
+  const { virtualCols, virtualRows, paddingTop, paddingBottom, paddingLeft, paddingRight } = useVirtualTable({
+    rows,
+    containerRef,
+    leafColumns,
+    columnSizing,
+  })
 
   return (
     <tbody>
-      {padding().top > 0 && <div role="presentation" style={{ height: `${padding().top}px` }} />}
+      {paddingTop > 0 && <div role="presentation" style={{ height: `${paddingTop}px` }} />}
 
-      <For each={virtualRows()}>
-        {(vRow) => {
-          const row = $(rows[vRow.index])
-          const outOfOrder = false // TODO do we need this logic
-          const rowCells = row.getVisibleCells()
+      {virtualRows.map((vRow) => {
+        const row = rows[vRow.index]
+        const outOfOrder = false // TODO do we need this logic
+        const rowCells = row.getVisibleCells()
 
-          return (
-            <tr
-              role="row"
-              class={tw('group relative flex', row.getIsSelected() && 'active')}
-              style={{
-                height: `${tableState.rowHeight}px`,
-                'margin-bottom': `${outOfOrder ? OUT_OF_ORDER_MARGIN : 0}px`,
-                'padding-left': `${padding().left}px`,
-                'padding-right': `${padding().right}px`,
-              }}
-            >
-              <For each={virtualCols()}>
-                {(vCell) => {
-                  const cell = $(rowCells[vCell.index])
+        return (
+          <tr
+            key={row.id}
+            role="row"
+            class={tw('group relative flex', row.getIsSelected() && 'active')}
+            style={{
+              height: `${rowHeight}px`,
+              'margin-bottom': `${outOfOrder ? OUT_OF_ORDER_MARGIN : 0}px`,
+              'padding-left': `${paddingLeft}px`,
+              'padding-right': `${paddingRight}px`,
+            }}
+          >
+            {virtualCols.map((vCell) => {
+              const cell = rowCells[vCell.index]
 
-                  return (
-                    <TableCell
-                      cell={cell}
-                      width={cell.column.getSize()}
-                      height={tableState.rowHeight}
-                      left={vCell.start}
-                      isPinned={!!cell.getContext().column.getIsPinned()}
-                    />
-                  )
-                }}
-              </For>
-            </tr>
-          )
-        }}
-      </For>
+              return (
+                <TableCell
+                  key={cell.id}
+                  cell={cell}
+                  width={cell.column.getSize()}
+                  height={rowHeight}
+                  left={vCell.start}
+                  isPinned={!!cell.getContext().column.getIsPinned()}
+                />
+              )
+            })}
+          </tr>
+        )
+      })}
 
-      {padding().bottom > 0 && <div role="presentation" style={{ height: `${padding().bottom}px` }} />}
+      {paddingBottom > 0 && <div role="presentation" style={{ height: `${paddingBottom}px` }} />}
     </tbody>
   )
 }

@@ -1,4 +1,4 @@
-import { ISideDrawerFieldProps } from '../types'
+import type { ISideDrawerFieldProps } from '../types'
 
 export default function ShortText(props: ISideDrawerFieldProps) {
   return (

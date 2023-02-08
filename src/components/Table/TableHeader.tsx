@@ -1,5 +1,5 @@
-import { flexRender, Table } from '@tanstack/solid-table'
-import { For } from 'solid-js'
+import type { Table } from '@tanstack/react-table'
+import { flexRender } from '@tanstack/react-table'
 
 import { DEFAULT_ROW_HEIGHT } from '~/lib/constants'
 import { tw } from '~/lib/utils'
@@ -11,30 +11,27 @@ type Props = {
 export const TableHeader = (props: Props) => {
   return (
     <thead>
-      <For each={props.table.getHeaderGroups()}>
-        {(group) => (
-          <tr>
-            <For each={group.headers}>
-              {(header) => (
-                <th
-                  aria-rowindex={1}
-                  colSpan={header.colSpan}
-                  style={{
-                    width: `${header.column.getSize()}px`,
-                    height: `${DEFAULT_ROW_HEIGHT}px`,
-                  }}
-                  class={tw(
-                    'border-base-300 bg-base-100 sticky top-0 z-[2] rounded-none border align-middle text-sm',
-                    // header.column.getIsPinned() === 'left' && 'right-shadow sticky left-0 !z-[3]',
-                  )}
-                >
-                  {!header.isPlaceholder && flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
+      {props.table.getHeaderGroups().map((group) => (
+        <tr key={group.id}>
+          {group.headers.map((header) => (
+            <th
+              key={header.id}
+              aria-rowindex={1}
+              colSpan={header.colSpan}
+              style={{
+                width: `${header.column.getSize()}px`,
+                height: `${DEFAULT_ROW_HEIGHT}px`,
+              }}
+              class={tw(
+                'border-base-300 bg-base-100 sticky top-0 z-[2] rounded-none border align-middle text-sm',
+                // header.column.getIsPinned() === 'left' && 'right-shadow sticky left-0 !z-[3]',
               )}
-            </For>
-          </tr>
-        )}
-      </For>
+            >
+              {!header.isPlaceholder && flexRender(header.column.columnDef.header, header.getContext())}
+            </th>
+          ))}
+        </tr>
+      ))}
     </thead>
   )
 }

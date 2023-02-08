@@ -1,12 +1,12 @@
 import { find, prop, propEq } from 'rambda'
 
-import { FieldType } from '~/lib/constants'
-import { Column } from '~/stores/database-store/types'
+import type { FieldType } from '~/lib/constants'
+import type { Column } from '~/types/project'
 
 // Import field configs
 import Text from './Text'
 // // import Aggregate from "./Aggregate";
-import { IFieldConfig } from './types'
+import type { IFieldConfig } from './types'
 
 // Export field configs in order for FieldsDropdown
 export const FIELDS: IFieldConfig[] = [

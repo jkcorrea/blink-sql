@@ -1,10 +1,11 @@
 // import BasicContextMenuActions from '~/components/Table/ContextMenu/BasicCellContextMenuActions'
-import { lazy } from 'solid-js'
+import { lazy } from 'preact/compat'
 
 import { withRenderTableCell } from '~/components/Table/TableCell/withRenderTableCell'
 import Icon from '~icons/tabler/letter-case'
 
-import { FieldType, IFieldConfig } from '../types'
+import type { IFieldConfig } from '../types'
+import { FieldType } from '../types'
 import DisplayCell from './DisplayCell'
 import EditorCell from './EditorCell'
 // import { filterOperators } from './Filter'

@@ -1,22 +1,15 @@
-import { JSX, splitProps } from 'solid-js'
+import type { JSX } from 'preact'
 
 import { tw } from '~/lib/utils'
 
-export interface TextInputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
+export interface TextInputProps extends JSX.HTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
   fullWidth?: boolean
   wrapperclass?: string
 }
 
-export const TextInput = (props: TextInputProps) => {
-  const [{ error, label, fullWidth, wrapperclass }, inputProps] = splitProps(props, [
-    'error',
-    'label',
-    'fullWidth',
-    'wrapperclass',
-  ])
-
+export const TextInput = ({ error, label, fullWidth, wrapperclass, ...inputProps }: TextInputProps) => {
   return (
     <div class={tw('form-control', fullWidth && 'w-full', wrapperclass)}>
       {label && (
@@ -28,7 +21,7 @@ export const TextInput = (props: TextInputProps) => {
       <input
         type="text"
         {...inputProps}
-        class={tw('input-bordered input', fullWidth && 'w-full', error && 'input-error', ...(inputProps?.class ?? []))}
+        class={tw('input-bordered input', fullWidth && 'w-full', error && 'input-error', inputProps.class?.toString())}
       />
       {error && (
         <label class="label py-1">

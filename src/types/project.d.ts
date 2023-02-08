@@ -1,7 +1,20 @@
-import { FieldType } from '~/lib/constants'
+import type { FieldType, VALID_DATABASE_TYPES } from '~/lib/constants'
 
-export const VALID_DATABASE_TYPES = ['mysql', 'postgres', 'mssql', 'sqlite3'] as const
 export type ValidDatabaseTypes = (typeof VALID_DATABASE_TYPES)[number]
+
+/**
+ * Represents a selected cell in the table
+ */
+export interface SelectedCell {
+  /**
+   * The cellId of the selected cell. Corresponds with TanStack Table's cell.id property, which is `rowId_colId`
+   */
+  id: string
+  /**
+   * Whether or not the cell is currently being focused (editing the value)
+   */
+  isFocused: boolean
+}
 
 /** Preferences the user may set on a particular column. */
 export interface ColumnPreferences {
@@ -48,6 +61,6 @@ export interface Table {
   columns: Record<string, Column>
 }
 
-export type DatabaseTables = Record<string, Table>
+export type ProjectTables = Record<string, Table>
 
-export type IntrospectionFn = (exec: (query: string) => Promise<unknown>) => Promise<DatabaseTables>
+export type IntrospectionFn = (exec: (query: string) => Promise<unknown>) => Promise<ProjectTables>

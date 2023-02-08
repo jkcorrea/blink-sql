@@ -1,4 +1,6 @@
-import { VALID_DATABASE_TYPES, ValidDatabaseTypes } from '../types'
+import type { ValidDatabaseTypes } from '~/types/project'
+
+import { VALID_DATABASE_TYPES } from '../constants'
 
 export interface BaseConnectionConfig {
   driver: Exclude<ValidDatabaseTypes, 'sqlite3'>

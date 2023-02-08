@@ -1,43 +1,38 @@
-import type { Column, ColumnSizingState, Row } from '@tanstack/solid-table'
-import { createVirtualizer } from '@tanstack/solid-virtual'
-import { defaultRangeExtractor } from '@tanstack/virtual-core'
-import { createEffect, createMemo, splitProps } from 'solid-js'
+import { useCallback, useEffect } from 'react'
+import type { Column, ColumnSizingState, Row } from '@tanstack/react-table'
+import type { Range } from '@tanstack/react-virtual'
+import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual'
 
-import { DEFAULT_COL_WIDTH, MIN_COL_WIDTH, TABLE_PADDING } from '~/lib/constants'
-import { useTable } from '~/stores'
+import { DEFAULT_COL_WIDTH, MIN_COL_WIDTH, TABLE_PADDING } from '~/lib/constants/table-constants'
+import { useTableStore } from '~/stores/table-store'
 
 import { splitCellId } from './utils'
 
 interface UseVirtualProps {
   rows: Row<any>[]
-  containerRef: HTMLDivElement | undefined
+  containerRef: React.RefObject<HTMLDivElement>
   leafColumns: Column<Row<any>, unknown>[]
   columnSizing: ColumnSizingState
 }
 
 /** Virtualizes the table rows and columns with TanStack's react-virtual */
-export function useVirtualTable(props: UseVirtualProps) {
-  const [tableState] = useTable()
-  const [{ rows, columnSizing, containerRef, leafColumns }, _] = splitProps(props, [
-    'rows',
-    'columnSizing',
-    'containerRef',
-    'leafColumns',
-  ])
+export function useVirtualTable({ rows, columnSizing, containerRef, leafColumns }: UseVirtualProps) {
+  const { rowHeight, selectedCell } = useTableStore(({ rowHeight, selectedCell }) => ({
+    rowHeight,
+    selectedCell,
+  }))
 
   // Virtualize rows
   const {
     getVirtualItems: getVirtualRows,
     getTotalSize: getTotalHeight,
     scrollToIndex: scrollToRowIndex,
-  } = createVirtualizer({
-    getScrollElement: () => containerRef,
-    get count() {
-      return rows.length
-    },
+  } = useVirtualizer({
+    getScrollElement: () => containerRef.current,
+    count: rows.length,
     overscan: 5,
     paddingEnd: TABLE_PADDING,
-    estimateSize: () => tableState.rowHeight,
+    estimateSize: useCallback(() => rowHeight, [rowHeight]),
     // useCallback(
     //   (index: number) => rowHeight + (rows[index]._rowy_outOfOrder ? OUT_OF_ORDER_MARGIN : 0),
     //   [rows, rowHeight],
@@ -49,62 +44,70 @@ export function useVirtualTable(props: UseVirtualProps) {
     getVirtualItems: getVirtualCols,
     getTotalSize: getTotalWidth,
     scrollToIndex: scrollToColIndex,
-  } = createVirtualizer({
-    getScrollElement: () => containerRef,
+  } = useVirtualizer({
+    getScrollElement: () => containerRef.current,
+    count: leafColumns.length,
     horizontal: true,
-    get count() {
-      return leafColumns.length
-    },
     overscan: 5,
     paddingStart: TABLE_PADDING,
     paddingEnd: TABLE_PADDING,
-    estimateSize: (index: number) => {
-      const columnDef = leafColumns[index].columnDef
-      const schemaWidth = columnDef.size
-      const localWidth = columnSizing[columnDef.id || '']
-      const definedWidth = localWidth || schemaWidth
+    estimateSize: useCallback(
+      (index: number) => {
+        const columnDef = leafColumns[index].columnDef
+        const schemaWidth = columnDef.size
+        const localWidth = columnSizing[columnDef.id || '']
+        const definedWidth = localWidth || schemaWidth
 
-      if (definedWidth === undefined) return DEFAULT_COL_WIDTH
-      if (definedWidth < MIN_COL_WIDTH) return MIN_COL_WIDTH
-      return definedWidth
-    },
+        if (definedWidth === undefined) return DEFAULT_COL_WIDTH
+        if (definedWidth < MIN_COL_WIDTH) return MIN_COL_WIDTH
+        return definedWidth
+      },
+      [leafColumns, columnSizing],
+    ),
+    rangeExtractor: useCallback(
+      (range: Range) => {
+        const defaultRange = defaultRangeExtractor(range)
+        const frozenColumns = leafColumns.filter((c) => c.getIsPinned()).map((c) => c.getPinnedIndex())
 
-    rangeExtractor: (range) => {
-      const defaultRange = defaultRangeExtractor(range)
-      const frozenColumns = leafColumns.filter((c) => c.getIsPinned()).map((c) => c.getPinnedIndex())
+        const combinedRange = Array.from(new Set([...defaultRange, ...frozenColumns])).sort((a, b) => a - b)
 
-      const combinedRange = Array.from(new Set([...defaultRange, ...frozenColumns])).sort((a, b) => a - b)
-
-      return combinedRange
-    },
+        return combinedRange
+      },
+      [leafColumns],
+    ),
   })
 
+  const virtualRows = getVirtualRows()
+  const totalHeight = getTotalHeight()
+  const virtualCols = getVirtualCols()
+  const totalWidth = getTotalWidth()
+
   // Scroll to selected cell
-  createEffect(() => {
-    if (!tableState.selectedCell) return
-    const { rowId, colId } = splitCellId(tableState.selectedCell.id)
+  useEffect(() => {
+    if (!selectedCell) return
+    const { rowId, colId } = splitCellId(selectedCell.id)
     const rowIdx = rows.findIndex((row) => row.id === rowId)
     const colIdx = leafColumns.findIndex((col) => col.id === colId)
     if (rowIdx > -1) scrollToRowIndex(rowIdx)
     if (colIdx > -1) scrollToColIndex(colIdx)
-  })
+  }, [selectedCell, rows, leafColumns, scrollToRowIndex, scrollToColIndex])
 
-  const getPadding = createMemo(() => ({
-    top: getVirtualRows().length > 0 ? getVirtualRows()?.[0]?.start || 0 : 0,
-    bottom:
-      getVirtualRows().length > 0 ? getTotalHeight() - (getVirtualRows()?.[getVirtualRows().length - 1]?.end || 0) : 0,
-    left: getVirtualCols().length > 0 ? getVirtualCols()?.[0]?.start || 0 : 0,
-    right:
-      getVirtualCols().length > 0 ? getTotalWidth() - (getVirtualCols()?.[getVirtualCols().length - 1]?.end || 0) : 0,
-  }))
+  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0
+  const paddingBottom = virtualRows.length > 0 ? totalHeight - (virtualRows?.[virtualRows.length - 1]?.end || 0) : 0
+
+  const paddingLeft = virtualCols.length > 0 ? virtualCols?.[0]?.start || 0 : 0
+  const paddingRight = virtualCols.length > 0 ? totalWidth - (virtualCols?.[virtualCols.length - 1]?.end || 0) : 0
 
   return {
+    virtualRows,
+    totalHeight,
     scrollToRowIndex,
+    virtualCols,
+    totalWidth,
     scrollToColIndex,
-    getVirtualRows,
-    getTotalHeight,
-    getVirtualCols,
-    getTotalWidth,
-    getPadding,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
   }
 }

@@ -1,10 +1,9 @@
-import { Cell, flexRender } from '@tanstack/solid-table'
+import type { Cell } from '@tanstack/react-table'
+import { flexRender } from '@tanstack/react-table'
 
 import { TABLE_PADDING } from '~/lib/constants'
 import { tw } from '~/lib/utils'
-import { useTable } from '~/stores'
-
-import type { IRenderedTableCellProps } from './withRenderTableCell'
+import { useTableStore } from '~/stores/table-store'
 
 interface Props<TData = any> {
   cell: Cell<TData, any>
@@ -16,41 +15,42 @@ interface Props<TData = any> {
   isPinned?: boolean
 }
 
-export const TableCell = (props: Props) => {
-  const { cell, isPinned, isReadonly, width, height, left } = $destructure(props)
-  const [tableState, { setSelectedCell }] = useTable()
-  const { selectedCell, rowHeight } = $destructure(tableState)
+export const TableCell = ({ cell, isPinned, isReadonly, width, height, left }: Props) => {
+  const { selectedCell, setSelectedCell, rowHeight } = useTableStore(
+    ({ selectedCell, setSelectedCell, rowHeight }) => ({ selectedCell, setSelectedCell, rowHeight }),
+  )
 
-  const isSelected = $selector(selectedCell?.id)
-  const isFocused = $(Boolean(isSelected(cell.id) && selectedCell?.isFocused))
+  const isSelected = selectedCell?.id === cell.id
+  const isFocused = isSelected && selectedCell?.isFocused
 
-  const setIsFocused = $((isFocused: boolean) => {
+  const setIsFocused = (isFocused: boolean) => {
     setSelectedCell({
       id: cell.id,
       isFocused,
     })
-  })
-  const tableCellComponentProps = $<IRenderedTableCellProps>({
+  }
+
+  const tableCellComponentProps = {
     ...cell.getContext(),
     value: cell.getValue(),
     isFocused,
     setIsFocused,
     disabled: isReadonly || cell.column.columnDef.meta?.isReadonly === false,
     rowHeight,
-  })
+  }
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <td
       role="gridcell"
-      data-selected={isSelected(cell.id)}
-      tabIndex={isSelected(cell.id) && !isFocused ? 0 : -1}
+      data-selected={isSelected}
+      tabIndex={isSelected && !isFocused ? 0 : -1}
       class={tw(
         `border-base-300 bg-base-100
          absolute flex cursor-default select-none items-center whitespace-nowrap border p-1 font-mono text-xs
          before:absolute before:inset-0 before:z-[4]`,
         isPinned && 'right-shadow sticky left-0 z-[1] shadow before:z-[3]',
-        isSelected(cell.id) && 'before:outline-primary/50 before:outline',
+        isSelected && 'before:outline-primary/50 before:outline',
       )}
       style={{
         width: `${width}px`,

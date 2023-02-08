@@ -1,19 +1,41 @@
+const builtinModules = require('module').builtinModules
+
+const builtinRE = '^(' + builtinModules.join('|') + ')(/|$)'
+
 /**
  * @type {import('@types/eslint').Linter.Config}
  */
 module.exports = {
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'solid', 'jsx-a11y', 'simple-import-sort', 'import', 'unused-imports', 'tailwindcss'],
+  plugins: ['jsx-a11y', 'simple-import-sort', 'import', 'unused-imports', 'tailwindcss'],
   extends: [
     'eslint:recommended',
-    'plugin:solid/typescript',
+    'plugin:react/jsx-runtime',
     'plugin:jsx-a11y/recommended',
     'plugin:tailwindcss/recommended',
     'plugin:prettier/recommended',
   ],
+  settings: {
+    // Picks up our custom tailwind helper
+    tailwindcss: {
+      callees: ['tw'],
+    },
+    react: {
+      version: 'detect',
+    },
+  },
   env: {
+    browser: true,
+    es2021: true,
     node: true,
   },
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+  ignorePatterns: ['node_modules', 'dist', 'build', 'coverage', 'public', '*.html'],
   rules: {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     'prettier/prettier': 'warn',
@@ -27,6 +49,7 @@ module.exports = {
       'warn',
       { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
     ],
+    'react/react-in-jsx-scope': 'off',
     // tailwind eslint plugin
     'tailwindcss/no-custom-classname': 'off',
     'tailwindcss/classnames-order': [
@@ -49,7 +72,7 @@ module.exports = {
           // Side effect imports first
           ['^\\u0000'],
           // Node.js builtins
-          ['^node:.*$', `^(${require('module').builtinModules.join('|')})(/|$)`],
+          ['^node:.*$', builtinRE],
           // React first, then any other packages
           ['^react$', '^@?\\w'],
           // Absolute imports (doesn"t start with .)
@@ -74,6 +97,10 @@ module.exports = {
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
+      plugins: ['@typescript-eslint'],
+      parserOptions: {
+        project: ['./tsconfig.json'],
+      },
       extends: [
         'plugin:@typescript-eslint/recommended',
         // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
@@ -87,6 +114,7 @@ module.exports = {
         '@typescript-eslint/no-empty-interface': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/consistent-type-imports': 'warn',
       },
     },
   ],

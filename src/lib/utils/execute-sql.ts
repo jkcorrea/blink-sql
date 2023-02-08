@@ -10,7 +10,7 @@ const SIDECAR_BASE_FLAGS = [
   '-c',
 ]
 
-export async function executeSql(sql: string, dbUrl: string): Promise<unknown> {
+export async function executeSql<T = unknown>(sql: string, dbUrl: string): Promise<T> {
   try {
     const cmd = Command.sidecar(SIDECAR_PATH, [...SIDECAR_BASE_FLAGS, sql, dbUrl])
     const res = await cmd.execute()

@@ -1,6 +1,6 @@
 // import { useState } from "react";
 
-import { JSX } from 'solid-js'
+import type { JSX } from 'preact/jsx-runtime'
 
 // import {
 //   ListItemIcon,

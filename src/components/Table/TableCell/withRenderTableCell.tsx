@@ -1,9 +1,12 @@
-import type { CellContext } from '@tanstack/solid-table'
-import { Match, Suspense, Switch, VoidComponent } from 'solid-js'
-import { useTippyHeadless } from 'solid-tippy'
+import { useFloating } from '@floating-ui/react'
+import type { CellContext } from '@tanstack/react-table'
+import type { FunctionComponent } from 'preact'
+import { memo, Suspense } from 'preact/compat'
+import { useEffect, useRef, useState } from 'preact/hooks'
+import { equals } from 'rambda'
 
 import type { IDisplayCellProps, IEditorCellProps } from '~/components/fields/types'
-import { useTable } from '~/stores'
+import { useTableStore } from '~/stores/table-store'
 
 export interface ICellOptions {
   /** If the rest of the row’s data is used, set this to true for memoization */
@@ -76,44 +79,52 @@ export interface IRenderedTableCellProps<TData = any, TValue = any> extends Cell
  * - {@link ICellOptions}
  */
 export function withRenderTableCell(
-  DisplayCellComponent: VoidComponent<IDisplayCellProps>,
-  EditorCellComponent: VoidComponent<IEditorCellProps> | null,
+  DisplayCellComponent: FunctionComponent<IDisplayCellProps>,
+  EditorCellComponent: FunctionComponent<IEditorCellProps> | null,
   editorMode: 'focus' | 'inline' | 'popover' = 'focus',
   options: ICellOptions = {},
 ) {
-  function RenderedTableCell(props: IRenderedTableCellProps) {
-    const { row: _row, cell, column, value, isFocused, setIsFocused, disabled, rowHeight } = $destructure(props)
-    const [tableState, { setDirtyField, clearDirtyField }] = useTable()
-    const isDirty = $(cell.id in tableState.dirtyFields)
-    const displayValue = $(isDirty ? tableState.dirtyFields[cell.id] : value)
-    // Store a ref to the parent of this cell, which is where we attach the popover to
-    let containerRef = $signal<HTMLElement | null>(null)
-    let popoverRef = $signal<HTMLElement>()
-    // Attach tippy to this ref
-    const tippy = useTippyHeadless(() => containerRef, {
-      disabled: editorMode !== 'popover',
-      props: {
-        content: popoverRef,
-        showOnCreate: isFocused,
-        hideOnClick: false,
-        interactive: true,
-        placement: 'bottom',
-        arrow: false,
-      },
-    })
-
-    // Render inline editor after timeout on mount to improve scroll performance
-    let inlineEditorReady = $signal(false)
-    $mount(
-      () =>
-        editorMode === 'inline' &&
-        setTimeout(() => {
-          inlineEditorReady = true
-        }),
+  function RenderedTableCell({
+    row: _row,
+    cell,
+    column,
+    value,
+    isFocused,
+    setIsFocused,
+    disabled,
+    rowHeight,
+  }: IRenderedTableCellProps) {
+    const { setDirtyField, clearDirtyField, displayValue } = useTableStore(
+      ({ dirtyFields, setDirtyField, clearDirtyField }) => ({
+        setDirtyField,
+        clearDirtyField,
+        displayValue: cell.id in dirtyFields ? dirtyFields[cell.id] : value,
+      }),
     )
 
+    const [isPopoverOpen, setIsPopverOpen] = useState(false)
+    const {
+      x,
+      y,
+      strategy: popoverPos,
+      refs: popoverRefs,
+    } = useFloating({
+      open: isPopoverOpen,
+      onOpenChange: setIsPopverOpen,
+      placement: 'bottom',
+    })
+
+    const containerRef = useRef<HTMLElement | null>(null)
+
+    // Render inline editor cell after timeout on mount
+    // to improve scroll performance
+    const [inlineEditorReady, setInlineEditorReady] = useState(false)
+    useEffect(() => {
+      if (editorMode === 'inline') setTimeout(() => setInlineEditorReady(true))
+    }, [])
+
     // Declare basicCell here so props can be reused by HeavyCellComponent
-    const basicCellProps = $<IDisplayCellProps>({
+    const basicCellProps = {
       id: cell.id,
       value: displayValue,
       name: column.columnDef.meta!.name,
@@ -123,63 +134,94 @@ export function withRenderTableCell(
       // _rowy_ref: row.original._rowy_ref,
       disabled,
       tabIndex: isFocused ? 0 : -1,
-      openPopover: () => tippy()?.show(),
-      closePopover: () => tippy()?.hide(),
+      openPopover: () => setIsPopverOpen(true),
+      closePopover: () => setIsPopverOpen(false),
       setIsFocused,
       rowHeight,
-    })
+    }
 
     // Show display cell, unless if editorMode is inline
-    const displayCell = $(
+    const displayCell = (
       <div
-        ref={(el) => (containerRef = el.parentElement)}
+        ref={(el) => {
+          if (el) containerRef.current = el.parentElement
+        }}
         class="overflow-x-clip"
         style={options.disablePadding ? { padding: 0 } : undefined}
       >
         <DisplayCellComponent {...basicCellProps} />
-      </div>,
+      </div>
     )
 
     // Show displayCell as a fallback if intentionally null
-    const editorCell = $(
-      EditorCellComponent ? (
-        <Suspense fallback={null}>
-          <EditorCellComponent
-            {...basicCellProps}
-            parentRef={containerRef}
-            onChange={(value) => setDirtyField(cell.id, value)}
-            onReset={() => clearDirtyField(cell.id)}
-          />
-        </Suspense>
-      ) : (
-        displayCell
-      ),
+    const editorCell = EditorCellComponent ? (
+      <Suspense fallback={null}>
+        <EditorCellComponent
+          {...basicCellProps}
+          parentRef={(el) => (containerRef.current = el)}
+          onChange={(value) => setDirtyField(cell.id, value)}
+          onReset={() => clearDirtyField(cell.id)}
+        />
+      </Suspense>
+    ) : (
+      displayCell
     )
 
-    return (
-      <Switch>
-        <Match when={disabled || (editorMode !== 'inline' && !isFocused)}>{displayCell}</Match>
-        <Match when={editorMode === 'inline' && !inlineEditorReady}>
-          {/* If the inline editor cell is not ready to be rendered, display nothing */}
-          {null}
-        </Match>
-        <Match when={editorMode === 'focus' && isFocused}>{editorCell}</Match>
-        <Match when={editorMode === 'inline'}>
+    if (disabled || (editorMode !== 'inline' && !isFocused)) {
+      return displayCell
+    } else if (editorMode === 'inline' && !inlineEditorReady) {
+      // If the inline editor cell is not ready to be rendered, display nothing
+      return null
+    } else if (editorMode === 'focus' && isFocused) {
+      return editorCell
+    } else if (editorMode === 'inline') {
+      return (
+        <div
+          class="cell-contents"
+          style={options.disablePadding ? { padding: 0 } : undefined}
+          ref={(el) => {
+            if (el) containerRef.current = el.parentElement
+          }}
+        >
+          {editorCell}
+        </div>
+      )
+    } else if (editorMode === 'popover') {
+      return (
+        <>
+          {displayCell}
           <div
-            class="cell-contents"
-            style={options.disablePadding ? { padding: 0 } : undefined}
-            ref={(el) => (containerRef = el.parentElement)}
+            ref={popoverRefs.setFloating}
+            style={{
+              position: popoverPos,
+              top: y ?? 0,
+              left: x ?? 0,
+              width: 'max-content',
+            }}
           >
             {editorCell}
           </div>
-        </Match>
-        <Match when={editorMode === 'popover'}>
-          {displayCell}
-          <div ref={(el) => (popoverRef = el)}>{editorCell}</div>
-        </Match>
-      </Switch>
-    )
+        </>
+      )
+    }
+
+    throw new Error('Invalid editor state!')
   }
 
-  return RenderedTableCell
+  return memo(
+    RenderedTableCell,
+    // Memo function
+    (prev, next) => {
+      const valueEqual = equals(prev.value, next.value)
+      const columnEqual = equals(prev.column.columnDef.meta, next.column.columnDef.meta)
+      const rowEqual = equals(prev.row.original, next.row.original)
+      const focusInsideCellEqual = prev.isFocused === next.isFocused
+      const disabledEqual = prev.disabled === next.disabled
+
+      const baseEqualities = valueEqual && columnEqual && focusInsideCellEqual && disabledEqual
+
+      if (options?.usesRowData) return baseEqualities && rowEqual
+      else return baseEqualities
+    },
+  )
 }

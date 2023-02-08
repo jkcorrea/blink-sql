@@ -1,4 +1,4 @@
-import { A } from '@solidjs/router'
+import { Link } from 'react-router-dom'
 
 export default function NotFound() {
   return (
@@ -12,13 +12,13 @@ export default function NotFound() {
         to learn how to build Solid apps.
       </p>
       <p class="my-4">
-        <A href="/" class="text-sky-600 hover:underline">
+        <Link href="/" class="text-sky-600 hover:underline">
           Home
-        </A>
+        </Link>
         {' - '}
-        <A href="/about" class="text-sky-600 hover:underline">
+        <Link href="/about" class="text-sky-600 hover:underline">
           About Page
-        </A>
+        </Link>
       </p>
     </main>
   )

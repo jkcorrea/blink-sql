@@ -1,8 +1,24 @@
 import { z } from 'zod'
 
 import { FieldType } from '~/lib/constants'
+import type { Column, IntrospectionFn, Table } from '~/types/project'
 
-import { Column, IntrospectionFn, Table } from '../types'
+// Get all tables for schema
+// SELECT table_name FROM information_schema.tables WHERE table_schema = '${schema}' ORDER BY table_name;
+
+// Get all enums for schema
+// SELECT t.typname as name, concat('"', string_agg(e.enumlabel, '","'), '"') AS value
+//         FROM pg_type t
+//         JOIN pg_enum e on t.oid = e.enumtypid
+//         JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+//         WHERE n.nspname = ${schema}
+//         GROUP BY name;
+
+// Get all columns for table
+// SELECT column_name, data_type, udt_name, ordinal_position, column_default, is_generated, is_nullable, is_updatable
+//         FROM information_schema.columns
+//         WHERE table_name = 'thing'
+//         ORDER BY ordinal_position;
 
 const PG_INTROSPECTION_QUERY = /* sql */ `
 SELECT c.table_schema,

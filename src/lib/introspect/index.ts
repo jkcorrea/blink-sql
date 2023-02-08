@@ -1,4 +1,5 @@
-import { IntrospectionFn, ValidDatabaseTypes } from '../types'
+import type { IntrospectionFn, ValidDatabaseTypes } from '~/types/project'
+
 import { introspect as postgres } from './postgres'
 
 const introspects: Record<ValidDatabaseTypes, IntrospectionFn> = {

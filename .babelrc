@@ -1,5 +1,9 @@
 {
+  "presets": [
+    "@babel/env",
+    ["@babel/typescript", { "jsxPragma": "h" }]
+  ],
   "plugins": [
-    ["babel-plugin-solid-labels", { "dev": false }]
+    ["@babel/transform-react-jsx", { "pragma": "h" }]
   ]
 }

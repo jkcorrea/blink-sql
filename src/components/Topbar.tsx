@@ -1,4 +1,4 @@
-import { A } from '@solidjs/router'
+import { Link } from 'react-router-dom'
 
 import ProjectIcon from '~icons/tabler/database'
 import HomeIcon from '~icons/tabler/letter-case'
@@ -13,16 +13,16 @@ export const Topbar = (props: Props) => {
       <div class="breadcrumbs flex h-full items-center text-sm">
         <ul>
           <li>
-            <A href="/">
+            <Link to="/">
               <HomeIcon class="h-3 w-3" />
               <span class="ml-2 text-sm">Home</span>
-            </A>
+            </Link>
           </li>
           <li>
-            <A href="/">
+            <Link to="/">
               <ProjectIcon class="h-3 w-3" />
               <span class="ml-2 text-sm">{props.projectName}</span>
-            </A>
+            </Link>
           </li>
         </ul>
       </div>

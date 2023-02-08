@@ -1,22 +1,26 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "jsxImportSource": "solid-js",
-    "resolveJsonModule": true,
-    "jsx": "preserve",
     "strict": true,
-    "types": ["vite/client", "unplugin-icons/types/solid",],
-    "noEmit": true,
-    "isolatedModules": true,
-    "allowUnusedLabels": true,
-    "baseUrl": "./",
+    "target": "esnext",
+    "lib": ["DOM", "DOM.Iterable", "esnext"],
+    "allowJs": false,
     "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "jsxImportSource": "preact",
+    "types": ["vite/client", "unplugin-icons/types/preact"],
+    "baseUrl": "./",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "react": ["./node_modules/preact/compat/"],
+      "react-dom": ["./node_modules/preact/compat/"]
     }
-  }
+  },
 }

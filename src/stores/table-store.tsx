@@ -1,45 +1,27 @@
-import { createContextProvider } from '@solid-primitives/context'
-import { capitalCase } from 'change-case'
-import { sortBy } from 'rambda'
-import { createMemo } from 'solid-js'
-import { createStore } from 'solid-js/store'
+/**
+ * This store combines React Context and Zustand to allow us to create multiple stores of the same type.
+ *
+ * E.g. if we had multiple tables up, we could have multiple instances of the table store for each one.
+ */
 
-import { SelectedCell } from '~/components/Table/types'
-import { DEFAULT_ROW_HEIGHT, FieldType } from '~/lib/constants'
+import { createContext } from 'preact'
+import type { PropsWithChildren } from 'preact/compat'
+import { useContext, useRef } from 'preact/compat'
+import { omit } from 'rambda'
+import { createStore, useStore } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
-import { Column } from './database-store/types'
-
-import data from '~/lib/constants/data.json'
-
-const columns = Object.keys(data[0]).reduce(
-  (obj, id, index) => ({
-    ...obj,
-    [id]: {
-      fieldName: id,
-      type: FieldType.TEXT,
-      name: capitalCase(id),
-      isPinned: index < 1,
-      id,
-      index,
-    },
-  }),
-  {} as Record<string, Column>,
-)
+import { DEFAULT_ROW_HEIGHT } from '~/lib/constants'
+import type { Column, SelectedCell } from '~/types/project'
 
 interface TableState {
-  columns: Record<string, Column>
-  readonly columnsOrdered: Column[]
   /** The currently selected cell in format: `rowId_columnId` */
   selectedCell: SelectedCell | null | undefined
   rowHeight: number
   dirtyFields: Record<string, any>
   hiddenColumns: Column['id'][]
-}
 
-interface TableActions {
-  addColumn: (column: Column) => void
-  updateColumn: (id: Column['id'], column: Partial<Omit<Column, 'id'>>) => void
-  removeColumn: (id: Column['id']) => void
+  // Actions
   setSelectedCell: (cell?: SelectedCell | null) => void
   setRowHeight: (height: number) => void
   setDirtyField: (id: string, value: any) => void
@@ -47,68 +29,50 @@ interface TableActions {
   clearAllDirtyFields: () => void
 }
 
-function createTableStore() {
-  // eslint-disable-next-line prefer-const
-  let getOrderedColumns: () => Column[]
+const createTableStore = () =>
+  createStore(
+    immer<TableState>((set) => ({
+      selectedCell: null,
+      rowHeight: DEFAULT_ROW_HEIGHT,
+      dirtyFields: {},
+      hiddenColumns: [],
 
-  const [state, setState] = createStore<TableState>({
-    columns,
-    selectedCell: null,
-    rowHeight: DEFAULT_ROW_HEIGHT,
-    dirtyFields: {},
-    hiddenColumns: [],
-    get columnsOrdered() {
-      return getOrderedColumns()
-    },
-  })
+      setSelectedCell: (cell) =>
+        set((state) => {
+          state.selectedCell = cell ?? null
+        }),
+      setRowHeight: (height) => set((state) => (state.rowHeight = height)),
+      setDirtyField: (cellId, value) =>
+        set((state) => {
+          state.dirtyFields[cellId] = value
+        }),
+      clearDirtyField: (cellId) =>
+        set((state) => {
+          state.dirtyFields = omit([cellId], state.dirtyFields)
+        }),
+      clearAllDirtyFields: () => set((state) => (state.dirtyFields = {})),
+    })),
+  )
 
-  // eslint-disable-next-line solid/reactivity
-  getOrderedColumns = createMemo(() => {
-    const cols = Object.values<Column>(state.columns)
-    return sortBy(
-      // If not fixed, bump it by cols.length to make sure it comes after all fixed cols
-      ({ userConfig, index }) => (userConfig?.isPinned ? index : cols.length + index),
-      cols,
-    )
-  })
+const Context = createContext<ReturnType<typeof createTableStore> | null>(null)
 
-  const actions: TableActions = {
-    addColumn(column) {
-      setState('columns', (columns) => ({ ...columns, [column.id]: column }))
-    },
-    updateColumn(id, column) {
-      setState('columns', (columns) => ({ ...columns, [id]: { ...columns[id], ...column } }))
-    },
-    removeColumn(id) {
-      setState('columns', (columns) => {
-        const { [id]: _, ...rest } = columns
-        return rest
-      })
-    },
-    setSelectedCell(cell) {
-      setState('selectedCell', cell)
-    },
-    setRowHeight(height) {
-      setState('rowHeight', height)
-    },
-    setDirtyField(id, value) {
-      setState('dirtyFields', (fields) => ({ ...fields, [id]: value }))
-    },
-    clearDirtyField(id) {
-      setState('dirtyFields', (fields) => {
-        const { [id]: _, ...rest } = fields
-        return rest
-      })
-    },
-    clearAllDirtyFields() {
-      setState('dirtyFields', {})
-    },
+interface Props extends PropsWithChildren {}
+
+export const TableStoreProvider = ({ children }: Props) => {
+  const storeRef = useRef<ReturnType<typeof createTableStore>>()
+
+  if (!storeRef.current) {
+    storeRef.current = createTableStore()
   }
 
-  const value = $([state, actions] as const)
-  return value
+  return <Context.Provider value={storeRef.current}>{children}</Context.Provider>
 }
 
-const [TableProvider, _useTable] = createContextProvider(createTableStore)
-const useTable = () => _useTable()!
-export { TableProvider, useTable }
+export function useTableStore<U>(selector: (state: TableState) => U, equalityFn?: (a: U, b: U) => boolean): U {
+  const store = useContext(Context)
+  if (!store) {
+    throw new Error('useTableStore must be used within a TableStoreProvider')
+  }
+
+  return useStore(store, selector, equalityFn)
+}
