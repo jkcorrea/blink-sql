@@ -8,7 +8,7 @@ use tauri::Manager;
 #[cfg(target_os = "macos")]
 mod macos;
 
-mod api;
+// mod api;
 
 #[tauri::command(async)]
 async fn app_ready(app_handle: tauri::AppHandle) {
@@ -19,9 +19,10 @@ async fn app_ready(app_handle: tauri::AppHandle) {
 
 #[tokio::main]
 async fn main() {
-    let router = api::mount();
+    // let router = api::mount();
     tauri::Builder::default()
-        .plugin(rspc::integrations::tauri::plugin(router, || ()))
+        // NOTE: enable this for rspc
+        // .plugin(rspc::integrations::tauri::plugin(router, || ()))
         .invoke_handler(tauri::generate_handler![app_ready])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

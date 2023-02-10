@@ -1,6 +1,6 @@
 import type { FunctionComponent, JSX } from 'preact'
 
-import { FieldType } from '~/lib/constants'
+import { FieldType } from '~/constants'
 import type { Column, SelectedCell } from '~/types/project'
 
 import type { IContextMenuItem } from '../Table/ContextMenu/ContextMenuItem'

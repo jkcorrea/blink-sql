@@ -1,5 +1,7 @@
 import { Command } from '@tauri-apps/api/shell'
 
+import type { RunnerFn } from '.'
+
 const SIDECAR_PATH = 'binaries/usql/usql'
 const SIDECAR_BASE_FLAGS = [
   // Output results as JSON
@@ -10,7 +12,7 @@ const SIDECAR_BASE_FLAGS = [
   '-c',
 ]
 
-export async function executeSql<T = unknown>(sql: string, dbUrl: string): Promise<T> {
+export const runner: RunnerFn = async (sql, dbUrl) => {
   try {
     const cmd = Command.sidecar(SIDECAR_PATH, [...SIDECAR_BASE_FLAGS, sql, dbUrl])
     const res = await cmd.execute()

@@ -1,9 +1,9 @@
 import type { Cell } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
 
-import { TABLE_PADDING } from '~/lib/constants'
-import { tw } from '~/lib/utils'
-import { useTableStore } from '~/stores/table-store'
+import { TABLE_PADDING } from '~/constants'
+import { tw } from '~/utils/tw'
+import { useTableStore } from '~/components/Table/TableStore'
 
 interface Props<TData = any> {
   cell: Cell<TData, any>

@@ -1,9 +1,9 @@
 import type { Column, ColumnSizingState, Row } from '@tanstack/react-table'
 
 // import { TableServiceProvider, useTableService } from './TableService'
-import { OUT_OF_ORDER_MARGIN } from '~/lib/constants'
-import { tw } from '~/lib/utils'
-import { useTableStore } from '~/stores/table-store'
+import { OUT_OF_ORDER_MARGIN } from '~/constants'
+import { tw } from '~/utils/tw'
+import { useTableStore } from '~/components/Table/TableStore'
 
 import { TableCell } from './TableCell'
 import { useVirtualTable } from './useVirtualTable'

@@ -1,19 +1,27 @@
 import { createBrowserRouter } from 'react-router-dom'
 
 import NotFound from './pages/404'
-import ProjectIndex, { loader as rootLoader } from './pages/project'
+import ProjectIndex, { loader as projectLoader } from './pages/project'
 import ProjectTable, { loader as projectTableLoader } from './pages/project/table'
+import RootIndex, { loader as rootLoader } from './pages/root'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <ProjectIndex />,
+    element: <RootIndex />,
     loader: rootLoader,
     children: [
       {
-        path: 't/:tableName',
-        element: <ProjectTable />,
-        loader: projectTableLoader,
+        path: 'p/:projectId',
+        element: <ProjectIndex />,
+        loader: projectLoader,
+        children: [
+          {
+            path: 't/:tableId',
+            element: <ProjectTable />,
+            loader: projectTableLoader,
+          },
+        ],
       },
     ],
   },
@@ -22,3 +30,6 @@ export const router = createBrowserRouter([
     element: <NotFound />,
   },
 ])
+
+// Clean & abort all pending requests on HMR
+if (import.meta.hot) import.meta.hot.dispose(() => router.dispose())

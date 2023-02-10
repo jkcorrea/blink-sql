@@ -4,10 +4,12 @@ specifiers:
   '@babel/core': ^7.20.12
   '@floating-ui/react': ^0.19.1
   '@iconify-json/tabler': ^1.1.57
+  '@lukemorales/query-key-factory': ^1.1.0
   '@preact/preset-vite': ^2.5.0
   '@svgr/core': ^6.5.1
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/typography': ^0.5.8
+  '@tanstack/query-core': ^4.24.4
   '@tanstack/react-query': ^4.24.4
   '@tanstack/react-table': ^8.7.4
   '@tanstack/react-virtual': ^3.0.0-beta.6
@@ -55,8 +57,10 @@ specifiers:
 
 dependencies:
   '@floating-ui/react': 0.19.1_ive3jjn476xyi3ikfsqwmh5x74
+  '@lukemorales/query-key-factory': 1.1.0_mc3ebmoy2jmm7hvhvejzec65by
   '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.4
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.4
+  '@tanstack/query-core': 4.24.4
   '@tanstack/react-query': 4.24.4_ive3jjn476xyi3ikfsqwmh5x74
   '@tanstack/react-table': 8.7.9_ive3jjn476xyi3ikfsqwmh5x74
   '@tanstack/react-virtual': 3.0.0-beta.43_@preact+compat@17.1.2
@@ -694,6 +698,15 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
+
+  /@lukemorales/query-key-factory/1.1.0_mc3ebmoy2jmm7hvhvejzec65by:
+    resolution: {integrity: sha512-9CjPb7HSsnPfa/urgb0aSzMBjwzKq3maVC9JY0Y8PDYwDRNUqnwudtyDMCAFcKZgssu9xT8QKrpByOq2IlWDWQ==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@tanstack/query-core': ^4.0.0
+    dependencies:
+      '@tanstack/query-core': 4.24.4
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}

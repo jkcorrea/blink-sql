@@ -1,6 +1,6 @@
 import type { JSX } from 'preact'
 
-import { tw } from '~/lib/utils'
+import { tw } from '~/utils/tw'
 
 export interface TextInputProps extends JSX.HTMLAttributes<HTMLInputElement> {
   label?: string

@@ -1,30 +1,36 @@
 import { useQuery } from '@tanstack/react-query'
 import type { LoaderFunction } from 'react-router-dom'
-import { json, useLoaderData } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
-import { Table } from '~/components/Table'
-import { useProjectStore } from '~/stores/project-store'
-import { TableStoreProvider } from '~/stores/table-store'
+import { Table as TableUI } from '~/components/Table'
+import { TableStoreProvider } from '~/components/Table/TableStore'
+import { Q, queryClient } from '~/services/query-client'
+
+const columnsQuery = (tableId: string | undefined) => {
+  if (!tableId) throw new Error('No table ID found')
+  return Q.project.detail('1')._ctx.columns(tableId)
+}
 
 export default function ProjectTable() {
-  const { tableName } = useLoaderData() as { tableName: string }
-  const { table, exec } = useProjectStore(({ tables, exec }) => ({ table: tables[tableName], exec }))
+  const data = [] as any[]
+  const isLoading = false
 
-  const columns = table?.columns ?? []
+  const params = useParams()
+  const columns = useQuery(columnsQuery(params.tableId))
 
-  const { data, isLoading } = useQuery(
-    ['project', tableName, 'select'],
-    async () => exec<any[]>(`SELECT * FROM ${`${table?.schema}.` ?? ''}${tableName}`),
-    { enabled: Boolean(table) },
-  )
+  // const { data, isLoading } = useQuery(
+  //   ['project', tableName, 'select'],
+  //   async () => exec<any[]>(`SELECT * FROM ${`${table?.schema}.` ?? ''}${tableName}`),
+  //   { enabled: Boolean(table) },
+  // )
 
   return (
     <TableStoreProvider>
-      <Table columns={columns} data={data ?? []} isLoading={isLoading} />
+      <TableUI columns={columns.data ?? []} data={data ?? []} isLoading={isLoading} />
     </TableStoreProvider>
   )
 }
 
 export const loader: LoaderFunction = async ({ params }) => {
-  return json({ tableName: params.tableName }, { headers: { 'cache-control': 'no-store' } })
+  return queryClient.fetchQuery(columnsQuery(params.tableId))
 }

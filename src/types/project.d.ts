@@ -1,6 +1,5 @@
-import type { FieldType, VALID_DATABASE_TYPES } from '~/lib/constants'
-
-export type ValidDatabaseTypes = (typeof VALID_DATABASE_TYPES)[number]
+import type { FieldType } from '~/constants'
+import type { ConnectionConfig } from '~/services/engine/connection-config'
 
 /**
  * Represents a selected cell in the table
@@ -58,9 +57,10 @@ export interface Table {
   name: string
   /** Postgres has the concept of "schemas", we're just mapping it to a less confusing name */
   schema?: string
-  columns: Record<string, Column>
 }
 
-export type ProjectTables = Record<string, Table>
-
-export type IntrospectionFn = (exec: (query: string) => Promise<unknown>) => Promise<ProjectTables>
+export interface Project {
+  id: string
+  name: string
+  connection: ConnectionConfig
+}

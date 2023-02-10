@@ -1,27 +1,16 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api'
 import { render } from 'preact'
 import { Suspense } from 'preact/compat'
 import { useEffect } from 'preact/hooks'
 import { RouterProvider } from 'react-router-dom'
 
-import type { FallbackRender } from './components/ErrorBoundary'
-import { ErrorBoundary } from './components/ErrorBoundary'
-import { ProjectProvider } from './stores/project-store'
+import { queryClient } from './services/query-client'
+import type { FallbackRender } from './utils/ErrorBoundary'
+import { ErrorBoundary } from './utils/ErrorBoundary'
 import { router } from './router'
 
 import './index.css'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // We should only refetch when explicitly runs a query
-      refetchOnWindowFocus: false,
-      // Alert user of errors & let them decide what to do
-      retry: false,
-    },
-  },
-})
 
 function App() {
   useEffect(() => {
@@ -32,9 +21,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Suspense fallback="Loading...">
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <ProjectProvider databaseUrl="postgres://postgres:postgres@localhost:54322?sslmode=disable">
-            <RouterProvider router={router} />
-          </ProjectProvider>
+          <RouterProvider router={router} />
         </ErrorBoundary>
       </Suspense>
     </QueryClientProvider>
@@ -59,18 +46,14 @@ const ErrorFallback: FallbackRender = ({ error, resetErrorBoundary }) => (
   </div>
 )
 
+// NOTE: Workaround for a strange Vite hot-reloading bug
+// see: https://github.com/vitejs/vite/issues/7839#issuecomment-1340109679
 if (import.meta.hot) {
-  // Workaround for a strange Vite hot-reloading bug, see:
-  // https://github.com/vitejs/vite/issues/7839#issuecomment-1340109679
-  import.meta.hot.dispose(() => router.dispose())
-  import.meta.hot.on('vite:beforeUpdate', onBeforeViteUpdate)
-}
-
-function onBeforeViteUpdate(event: any) {
-  if (event.type === 'update') {
+  const onBeforeViteUpdate = (event: any) => {
+    if (event.type !== 'update') return
     // Patch `event.updates` to remove the version query parameter from path,
     // so that the update gets picked up.
-    // Why the stored `deps` are missing this part of the URL, I cannot say…
+    // NOTE Why the stored `deps` are missing this part of the URL, I cannot say…
     const updates = []
     for (const update of event.updates) {
       updates.push(update, {
@@ -80,6 +63,7 @@ function onBeforeViteUpdate(event: any) {
     }
     event.updates = updates
   }
+  import.meta.hot.on('vite:beforeUpdate', onBeforeViteUpdate)
 }
 
 render(<App />, document.getElementById('root') as HTMLElement)

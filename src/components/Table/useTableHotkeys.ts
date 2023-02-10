@@ -1,7 +1,7 @@
 import type { Column, Row } from '@tanstack/react-table'
 import { useHotkeys } from 'react-hotkeys-hook'
 
-import { useTableStore } from '~/stores/table-store'
+import { useTableStore } from '~/components/Table/TableStore'
 
 interface Props {
   rows: Row<any>[]

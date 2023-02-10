@@ -2,8 +2,8 @@ import type { ColumnPinningState, VisibilityState } from '@tanstack/react-table'
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 
-import { MIN_COL_WIDTH } from '~/lib/constants'
-import { useTableStore } from '~/stores/table-store'
+import { useTableStore } from '~/components/Table/TableStore'
+import { MIN_COL_WIDTH } from '~/constants'
 import type { Column } from '~/types/project'
 
 import { getFieldProp, getFieldType } from '../fields'
@@ -19,7 +19,7 @@ declare module '@tanstack/react-table' {
 }
 
 interface TableProps {
-  columns: Record<string, Column>
+  columns: Column[]
   data: any[] | null
   isLoading?: boolean
 }
@@ -29,7 +29,7 @@ export function Table({ columns: _cols, data, isLoading }: TableProps) {
   // Grab columns from store & filter/transform them into React Table columns
   const { hiddenColumns, columns } = useTableStore(({ hiddenColumns }) => ({
     hiddenColumns,
-    columns: Object.values(_cols)
+    columns: _cols
       // TODO hiddenColumn/isHidden state is in two different places
       .filter((cfg) => !cfg.userConfig?.isHidden)
       .map((cfg) =>

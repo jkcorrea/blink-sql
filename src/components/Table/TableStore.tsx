@@ -11,7 +11,7 @@ import { omit } from 'rambda'
 import { createStore, useStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
-import { DEFAULT_ROW_HEIGHT } from '~/lib/constants'
+import { DEFAULT_ROW_HEIGHT } from '~/constants'
 import type { Column, SelectedCell } from '~/types/project'
 
 interface TableState {

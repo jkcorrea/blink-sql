@@ -1,8 +1,8 @@
 import type { Table } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
 
-import { DEFAULT_ROW_HEIGHT } from '~/lib/constants'
-import { tw } from '~/lib/utils'
+import { DEFAULT_ROW_HEIGHT } from '~/constants'
+import { tw } from '~/utils/tw'
 
 type Props = {
   table: Table<any>

@@ -3,8 +3,8 @@ import type { Column, ColumnSizingState, Row } from '@tanstack/react-table'
 import type { Range } from '@tanstack/react-virtual'
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual'
 
-import { DEFAULT_COL_WIDTH, MIN_COL_WIDTH, TABLE_PADDING } from '~/lib/constants/table-constants'
-import { useTableStore } from '~/stores/table-store'
+import { DEFAULT_COL_WIDTH, MIN_COL_WIDTH, TABLE_PADDING } from '~/constants/table-constants'
+import { useTableStore } from '~/components/Table/TableStore'
 
 import { splitCellId } from './utils'
 

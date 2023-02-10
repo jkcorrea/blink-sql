@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import { equals } from 'rambda'
 
 import type { IDisplayCellProps, IEditorCellProps } from '~/components/fields/types'
-import { useTableStore } from '~/stores/table-store'
+import { useTableStore } from '~/components/Table/TableStore'
 
 export interface ICellOptions {
   /** If the rest of the row’s data is used, set this to true for memoization */

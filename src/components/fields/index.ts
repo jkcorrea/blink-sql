@@ -1,6 +1,6 @@
 import { find, prop, propEq } from 'rambda'
 
-import type { FieldType } from '~/lib/constants'
+import type { FieldType } from '~/constants'
 import type { Column } from '~/types/project'
 
 // Import field configs
