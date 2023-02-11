@@ -22,7 +22,8 @@ export const TableHeader = (props: Props) => {
                 height: `${DEFAULT_ROW_HEIGHT}px`,
               }}
               class={tw(
-                'border-base-300 bg-base-100 sticky top-0 z-[2] rounded-none border align-middle text-sm',
+                'sticky top-0 z-[2] inline-block px-2',
+                'border-base-300 bg-base-100 rounded-none border text-left text-sm',
                 // header.column.getIsPinned() === 'left' && 'right-shadow sticky left-0 !z-[3]',
               )}
             >
