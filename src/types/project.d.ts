@@ -1,5 +1,5 @@
 import type { FieldType } from '~/constants'
-import type { ConnectionConfig } from '~/services/engine/connection-config'
+import type { BaseDriver } from '~/services/engine/drivers/base-driver'
 
 /**
  * Represents a selected cell in the table
@@ -62,5 +62,5 @@ export interface Table {
 export interface Project {
   id: string
   name: string
-  connection: ConnectionConfig
+  driver: InstanceType<BaseDriver>
 }

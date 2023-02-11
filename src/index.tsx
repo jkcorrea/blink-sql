@@ -1,8 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api'
 import { render } from 'preact'
 import { Suspense } from 'preact/compat'
-import { useEffect } from 'preact/hooks'
 import { RouterProvider } from 'react-router-dom'
 
 import { queryClient } from './services/query-client'
@@ -13,9 +11,9 @@ import { router } from './router'
 import './index.css'
 
 function App() {
-  useEffect(() => {
-    invoke('app_ready')
-  })
+  // useEffect(() => {
+  //   invoke('app_ready')
+  // }, [])
 
   return (
     <QueryClientProvider client={queryClient}>

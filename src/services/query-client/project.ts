@@ -1,20 +1,24 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory'
 
 import type { Column, Project, Table } from '~/types/project'
-import { ConnectionConfig } from '~/utils/connection-config'
 
-import { getDriverForConnection } from '../engine/drivers'
+import { createDriver } from '../engine/drivers'
+import type { SelectParams } from '../engine/drivers/base-driver'
 
 // TODO: store this in localstorage
 const projects: Project[] = [
   {
     id: '1',
     name: 'Project 1',
-    connection: ConnectionConfig.fromDatabaseUrl(
-      'postgres://postgres:postgres@localhost:54322/postgres?sslmode=disable',
-    ),
+    driver: createDriver('postgres://postgres:postgres@localhost:54322/postgres?sslmode=disable'),
   },
 ]
+
+const getProject = (projectId: string): Project => {
+  const project = projects.find((p) => p.id === projectId)
+  if (!project) throw new Error(`Project ${projectId} not found`)
+  return project
+}
 
 export const projectQueries = createQueryKeys('project', {
   list: {
@@ -28,19 +32,22 @@ export const projectQueries = createQueryKeys('project', {
       tables: {
         queryKey: null,
         queryFn: (): Promise<Table[]> => {
-          const prj = projects.find((p) => p.id === projectId)
-          if (!prj) throw new Error(`Project ${projectId} not found`)
-          const driver = getDriverForConnection(prj.connection)
-          return driver.introspectTables()
+          const { driver } = getProject(projectId)
+          return driver.getTables()
         },
       },
       columns: (tableId: string) => ({
         queryKey: [tableId],
         queryFn: (): Promise<Column[]> => {
-          const prj = projects.find((p) => p.id === projectId)
-          if (!prj) throw new Error(`Project ${projectId} not found`)
-          const driver = getDriverForConnection(prj.connection)
-          return driver.introspectColumns(tableId)
+          const { driver } = getProject(projectId)
+          return driver.getColumns(tableId)
+        },
+      }),
+      data: (tableId: string, params?: SelectParams) => ({
+        queryKey: params ? [tableId, params] : [tableId],
+        queryFn: (): Promise<unknown[]> => {
+          const { driver } = getProject(projectId)
+          return driver.select(tableId, params)
         },
       }),
     },

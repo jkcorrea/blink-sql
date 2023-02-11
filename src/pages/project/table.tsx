@@ -11,12 +11,15 @@ const columnsQuery = (tableId: string | undefined) => {
   return Q.project.detail('1')._ctx.columns(tableId)
 }
 
-export default function ProjectTable() {
-  const data = [] as any[]
-  const isLoading = false
+const dataQuery = (tableId: string | undefined) => {
+  if (!tableId) throw new Error('No table ID found')
+  return Q.project.detail('1')._ctx.data(tableId)
+}
 
+export default function ProjectTable() {
   const params = useParams()
   const columns = useQuery(columnsQuery(params.tableId))
+  const data = useQuery(dataQuery(params.tableId))
 
   // const { data, isLoading } = useQuery(
   //   ['project', tableName, 'select'],
@@ -26,11 +29,14 @@ export default function ProjectTable() {
 
   return (
     <TableStoreProvider>
-      <TableUI columns={columns.data ?? []} data={data ?? []} isLoading={isLoading} />
+      <TableUI columns={columns.data ?? []} data={data.data ?? []} isLoading={data.isLoading} />
     </TableStoreProvider>
   )
 }
 
 export const loader: LoaderFunction = async ({ params }) => {
-  return queryClient.fetchQuery(columnsQuery(params.tableId))
+  return Promise.all([
+    queryClient.fetchQuery(columnsQuery(params.tableId)),
+    queryClient.fetchQuery(dataQuery(params.tableId)),
+  ])
 }

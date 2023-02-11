@@ -17,7 +17,6 @@ export const TableHeader = (props: Props) => {
             <th
               key={header.id}
               aria-rowindex={1}
-              colSpan={header.colSpan}
               style={{
                 width: `${header.column.getSize()}px`,
                 height: `${DEFAULT_ROW_HEIGHT}px`,
