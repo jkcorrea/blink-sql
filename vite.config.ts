@@ -1,6 +1,7 @@
 import preact from '@preact/preset-vite'
 import Icons from 'unplugin-icons/vite'
 import { defineConfig } from 'vite'
+import rewriteAll from 'vite-plugin-rewrite-all'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
@@ -10,6 +11,8 @@ export default defineConfig({
     // }),
     preact(),
     tsconfigPaths(),
+    // NOTE - fixes '.' in URLs issue: https://github.com/remix-run/react-router/issues/2143
+    rewriteAll(),
     Icons({ compiler: 'jsx', jsx: 'preact' }),
   ],
 
