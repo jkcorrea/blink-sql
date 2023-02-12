@@ -12,18 +12,18 @@ Blink is a modern & open-source SQL database client with a focus on rich data & 
 
 ## Quick start
 
-1. Install NPM dependencies
+#### 1. Install NPM dependencies
 ```sh
 pnpm install
 ```
 
-2. Install other system dependencies via the `setup-system.sh` script:
+#### 2. Install other system dependencies via the `setup-system.sh` script:
 ```sh
 ./scripts/setup-system.sh
 ```
 > NOTE: This will download & build [uSQL](https://github.com/xo/usql), which we currently use to make SQL queries to an array of database types. You should get with a binary in the `src-tauri/binaries/usql` directory. We do not track this binary in Git.
 
-3. Run the project with Tauri!
+#### 3. Run the project with Tauri!
 ```sh
 pnpm tauri dev
 ```
