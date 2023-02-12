@@ -21,3 +21,6 @@ gitignore
 # System Files
 .DS_Store
 Thumbs.db
+
+# Don't keep sidecar binaries in the repo
+src-tauri/binaries/*
