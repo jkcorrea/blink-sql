@@ -1,27 +1,23 @@
 import { useQuery } from '@tanstack/react-query'
-import { capitalCase } from 'change-case'
 import type { LoaderFunction } from 'react-router-dom'
-import { Link, Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 
+import { ProjectSidebar, ProjectSidebarLoader } from '~/components/ProjectSidebar'
 import { Q, queryClient } from '~/services/query-client'
 
+const projectQuery = Q.project.detail('1')
 const tablesQuery = Q.project.detail('1')._ctx.tables
 
 export default function ProjectIndex() {
-  const tables = useQuery(tablesQuery)
+  const { data: project } = useQuery(projectQuery)
+  const { data: tables } = useQuery(tablesQuery)
+
+  if (!project || !tables) return ProjectSidebarLoader
 
   return (
     <div className="relative flex h-full w-full overflow-hidden whitespace-nowrap">
       {/* Left Sidebar */}
-      <div className="bg-base-100 text-base-content relative h-full">
-        <ul className="flex h-full flex-col overflow-auto">
-          {Object.values(tables.data ?? []).map(({ id, name }) => (
-            <Link key={id} to={`t/${id}`} className="cursor-default">
-              <li className="hover:bg-primary/5 py-1 px-5">{capitalCase(name)}</li>
-            </Link>
-          ))}
-        </ul>
-      </div>
+      <ProjectSidebar project={project} tables={tables} />
 
       {/* Main content */}
       <Outlet />
@@ -30,5 +26,7 @@ export default function ProjectIndex() {
 }
 
 export const loader: LoaderFunction = async ({ params: _ }) => {
-  return queryClient.fetchQuery(tablesQuery)
+  return Promise.all([queryClient.fetchQuery(tablesQuery), queryClient.fetchQuery(projectQuery)])
 }
+
+export const Loader = ProjectSidebarLoader

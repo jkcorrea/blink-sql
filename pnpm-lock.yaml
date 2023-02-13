@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@babel/core': ^7.20.12
   '@floating-ui/react': ^0.19.1
+  '@headlessui/react': ^1.7.10
   '@iconify-json/tabler': ^1.1.57
   '@lukemorales/query-key-factory': ^1.1.0
   '@preact/preset-vite': ^2.5.0
@@ -58,6 +59,7 @@ specifiers:
 
 dependencies:
   '@floating-ui/react': 0.19.1_ive3jjn476xyi3ikfsqwmh5x74
+  '@headlessui/react': 1.7.10_ive3jjn476xyi3ikfsqwmh5x74
   '@lukemorales/query-key-factory': 1.1.0_mc3ebmoy2jmm7hvhvejzec65by
   '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.4
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.4
@@ -625,6 +627,18 @@ packages:
       tabbable: 6.0.1
     transitivePeerDependencies:
       - '@types/react'
+    dev: false
+
+  /@headlessui/react/1.7.10_ive3jjn476xyi3ikfsqwmh5x74:
+    resolution: {integrity: sha512-1m66h/5eayTEZVT2PI13/2PG3EVC7a9XalmUtVSC8X76pcyKYMuyX1XAL2RUtCr8WhoMa/KrDEyoeU5v+kSQOw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+      react-dom: ^16 || ^17 || ^18
+    dependencies:
+      client-only: 0.0.1
+      react: /@preact/compat/17.1.2_preact@10.11.3
+      react-dom: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
 
   /@humanwhocodes/config-array/0.11.8:
@@ -1582,6 +1596,10 @@ packages:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.2
+
+  /client-only/0.0.1:
+    resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+    dev: false
 
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
