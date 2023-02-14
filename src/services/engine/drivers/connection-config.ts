@@ -37,6 +37,7 @@ export class ConnectionConfig {
     let type = protocol.toUpperCase()
 
     if (type === 'MYSQL2') type = SqlDriverType.MYSQL
+    if (type === 'POSTGRESQL') type = SqlDriverType.POSTGRES
     if (!assertValidDriver(type)) throw new Error(`Invalid database protocol: ${protocol} in ${databaseUrl}`)
 
     let database = parsedUrl.pathname?.replace(/^\//, '').replace(/\/$/, '') ?? ''
