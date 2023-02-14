@@ -2,9 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent overscroll bounce */
-html, body {
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  height: 100%;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+  /* Prevent overscroll bounce */
   overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  /* Disable drag-to-select on most elements */
+  user-select: none;
+}
+
+a, img {
+  /* TODO do we need to do this another way for Chromium? */
+  /* Disable drag-n-drop for images and links in Safari */
+  -webkit-user-drag: none;
 }
 
 .right-shadow {

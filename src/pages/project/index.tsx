@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import type { LoaderFunction } from 'react-router-dom'
 import { Outlet } from 'react-router-dom'
 
@@ -12,16 +13,27 @@ export default function ProjectIndex() {
   const { data: project } = useQuery(projectQuery)
   const { data: tables } = useQuery(tablesQuery)
 
-  if (!project || !tables) return ProjectSidebarLoader
+  if (!project || !tables) return <ProjectSidebarLoader />
 
   return (
-    <div className="relative flex h-full w-full overflow-hidden whitespace-nowrap">
+    <PanelGroup
+      autoSaveId={project.id}
+      disablePointerEventsDuringResize
+      direction="horizontal"
+      className="overflow-hidden whitespace-nowrap"
+    >
       {/* Left Sidebar */}
-      <ProjectSidebar project={project} tables={tables} />
+      <Panel order={1} defaultSize={20} minSize={10} maxSize={30}>
+        <ProjectSidebar project={project} tables={tables} />
+      </Panel>
+
+      <PanelResizeHandle className="relative w-[2px] bg-gray-300 outline-none hover:bg-gray-400" />
 
       {/* Main content */}
-      <Outlet />
-    </div>
+      <Panel order={2}>
+        <Outlet />
+      </Panel>
+    </PanelGroup>
   )
 }
 

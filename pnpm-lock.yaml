@@ -43,6 +43,7 @@ specifiers:
   react: npm:@preact/compat
   react-dom: npm:@preact/compat
   react-hotkeys-hook: ^4.3.5
+  react-resizable-panels: ^0.0.36
   react-router-dom: ^6.8.1
   sql-bricks: ^3.0.0
   tailwind-merge: ^1.8.1
@@ -75,6 +76,7 @@ dependencies:
   preact: 10.11.3
   rambda: 7.4.0
   react-hotkeys-hook: 4.3.5_ive3jjn476xyi3ikfsqwmh5x74
+  react-resizable-panels: 0.0.36_ive3jjn476xyi3ikfsqwmh5x74
   react-router-dom: 6.8.1_ive3jjn476xyi3ikfsqwmh5x74
   sql-bricks: 3.0.0
   tailwind-merge: 1.8.1
@@ -3262,6 +3264,16 @@ packages:
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
+
+  /react-resizable-panels/0.0.36_ive3jjn476xyi3ikfsqwmh5x74:
+    resolution: {integrity: sha512-aDGw+DTe/RwsUsdk0Z+xQ/Iz81CZRxTayg3WQ2d5PVAV/v9rcYikck75NpYnRuY3oOOu7+yl8H0Fj24Hk7ymxA==}
+    peerDependencies:
+      react: ^16.14.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: /@preact/compat/17.1.2_preact@10.11.3
+      react-dom: /@preact/compat/17.1.2_preact@10.11.3
+    dev: false
 
   /react-router-dom/6.8.1_ive3jjn476xyi3ikfsqwmh5x74:
     resolution: {integrity: sha512-67EXNfkQgf34P7+PSb6VlBuaacGhkKn3kpE51+P6zYSG2kiRoumXEL6e27zTa9+PGF2MNXbgIUHTVlleLbIcHQ==}
