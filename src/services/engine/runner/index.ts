@@ -5,4 +5,4 @@
 
 export { runner } from './usql'
 
-export type RunnerFn = <T = unknown>(sql: string, dbUrl: string) => Promise<T>
+export type RunnerFn = <T = unknown>(sql: string, databaseUrl: string) => Promise<T>

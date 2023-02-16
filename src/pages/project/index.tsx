@@ -1,44 +1,53 @@
 import { useQuery } from '@tanstack/react-query'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import type { LoaderFunction } from 'react-router-dom'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useParams } from 'react-router-dom'
 
 import { ProjectSidebar, ProjectSidebarLoader } from '~/components/ProjectSidebar'
+import Topbar from '~/components/Topbar'
 import { Q, queryClient } from '~/services/query-client'
 
-const projectQuery = Q.project.detail('1')
-const tablesQuery = Q.project.detail('1')._ctx.tables
+const projectQuery = (projectId: string) => Q.project.detail(projectId)
+const tablesQuery = (projectId: string) => Q.project.detail(projectId)._ctx.tables
 
 export default function ProjectIndex() {
-  const { data: project } = useQuery(projectQuery)
-  const { data: tables } = useQuery(tablesQuery)
+  const projectId = useParams().projectId!
+  const { data: project } = useQuery(projectQuery(projectId))
+  const { data: tables } = useQuery(tablesQuery(projectId))
 
   if (!project || !tables) return <ProjectSidebarLoader />
 
   return (
-    <PanelGroup
-      autoSaveId={project.id}
-      disablePointerEventsDuringResize
-      direction="horizontal"
-      className="overflow-hidden whitespace-nowrap"
-    >
-      {/* Left Sidebar */}
-      <Panel order={1} defaultSize={20} minSize={10} maxSize={30}>
-        <ProjectSidebar project={project} tables={tables} />
-      </Panel>
+    <main className="relative flex h-screen w-screen flex-col overflow-hidden">
+      <Topbar project={project} />
 
-      <PanelResizeHandle className="relative w-[2px] bg-gray-300 outline-none hover:bg-gray-400" />
+      <PanelGroup
+        autoSaveId={project.id}
+        disablePointerEventsDuringResize
+        direction="horizontal"
+        className="overflow-hidden whitespace-nowrap"
+      >
+        {/* Left Sidebar */}
+        <Panel order={1} defaultSize={20} minSize={10} maxSize={30}>
+          <ProjectSidebar project={project} tables={tables} />
+        </Panel>
 
-      {/* Main content */}
-      <Panel order={2}>
-        <Outlet />
-      </Panel>
-    </PanelGroup>
+        <PanelResizeHandle className="relative w-[2px] bg-gray-300 outline-none hover:bg-gray-400" />
+
+        {/* Main content */}
+        <Panel order={2}>
+          <Outlet />
+        </Panel>
+      </PanelGroup>
+    </main>
   )
 }
 
-export const loader: LoaderFunction = async ({ params: _ }) => {
-  return Promise.all([queryClient.fetchQuery(tablesQuery), queryClient.fetchQuery(projectQuery)])
+export const loader: LoaderFunction = async ({ params }) => {
+  return Promise.all([
+    queryClient.fetchQuery(tablesQuery(params.projectId!)),
+    queryClient.fetchQuery(projectQuery(params.projectId!)),
+  ])
 }
 
 export const Loader = ProjectSidebarLoader

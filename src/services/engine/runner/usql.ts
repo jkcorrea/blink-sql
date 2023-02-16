@@ -12,9 +12,12 @@ const SIDECAR_BASE_FLAGS = [
   '-c',
 ]
 
-export const runner: RunnerFn = async (sql, dbUrl) => {
+export const runner: RunnerFn = async (sql, databaseUrl) => {
+  const url = new URL(databaseUrl)
+  url.searchParams.set('sslmode', 'disable')
+
   try {
-    const cmd = Command.sidecar(SIDECAR_PATH, [...SIDECAR_BASE_FLAGS, sql, dbUrl])
+    const cmd = Command.sidecar(SIDECAR_PATH, [...SIDECAR_BASE_FLAGS, sql, url.toString()])
     const res = await cmd.execute()
 
     if (res.code !== 0) {

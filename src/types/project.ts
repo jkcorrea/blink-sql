@@ -1,5 +1,7 @@
+import { z } from 'zod'
+
 import type { FieldType } from '~/constants'
-import type { BaseDriver } from '~/services/engine/drivers/base-driver'
+import { SqlDriverType } from '~/constants'
 
 /**
  * Represents a selected cell in the table
@@ -59,8 +61,10 @@ export interface Table {
   schema?: string
 }
 
-export interface Project {
-  id: string
-  name: string
-  driver: InstanceType<BaseDriver>
-}
+export const ProjectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  databaseUrl: z.string(),
+  driverType: z.nativeEnum(SqlDriverType),
+})
+export type Project = z.infer<typeof ProjectSchema>

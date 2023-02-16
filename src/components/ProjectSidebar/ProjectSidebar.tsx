@@ -22,7 +22,7 @@ export const ProjectSidebar = ({ project, tables }: Props) => {
     if (!tables || tables.length === 0) return []
 
     // For Postgres, group tables by their schema
-    if (project?.driver.type === SqlDriverType.POSTGRES) {
+    if (project?.driverType === SqlDriverType.POSTGRES) {
       const grouped = tables.reduce((acc, table) => {
         const schema = table.schema ?? DEFAULT_SCHEMA
         if (!acc[schema]) acc[schema] = []
@@ -39,7 +39,7 @@ export const ProjectSidebar = ({ project, tables }: Props) => {
 
     // For other drivers, just put all tables in the public schema
     return [[DEFAULT_SCHEMA, tables]]
-  }, [tables, project?.driver])
+  }, [tables, project?.driverType])
 
   return (
     <div className="bg-base-100 text-base-content relative h-full overflow-y-auto overflow-x-hidden text-ellipsis">

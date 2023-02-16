@@ -74,10 +74,12 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 800,
         "resizable": true,
         "title": "blink",
-        "width": 800
+        "width": 1200,
+        "minWidth": 800,
+        "minHeight": 600
       }
     ]
   }

@@ -6,20 +6,14 @@ import { Table as TableUI } from '~/components/Table'
 import { TableStoreProvider } from '~/components/Table/TableStore'
 import { Q, queryClient } from '~/services/query-client'
 
-const columnsQuery = (tableId: string | undefined) => {
-  if (!tableId) throw new Error('No table ID found')
-  return Q.project.detail('1')._ctx.columns(tableId)
-}
+const columnsQuery = (projectId: string, tableId: string) => Q.project.detail(projectId)._ctx.columns(tableId)
 
-const dataQuery = (tableId: string | undefined) => {
-  if (!tableId) throw new Error('No table ID found')
-  return Q.project.detail('1')._ctx.data(tableId)
-}
+const dataQuery = (projectId: string, tableId: string) => Q.project.detail(projectId)._ctx.data(tableId)
 
 export default function ProjectTable() {
-  const params = useParams()
-  const columns = useQuery(columnsQuery(params.tableId))
-  const data = useQuery(dataQuery(params.tableId))
+  const { projectId, tableId } = useParams() ?? {}
+  const columns = useQuery(columnsQuery(projectId!, tableId!))
+  const data = useQuery(dataQuery(projectId!, tableId!))
 
   // const { data, isLoading } = useQuery(
   //   ['project', tableName, 'select'],
@@ -34,9 +28,9 @@ export default function ProjectTable() {
   )
 }
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ params: { projectId, tableId } = {} }) => {
   return Promise.all([
-    queryClient.fetchQuery(columnsQuery(params.tableId)),
-    queryClient.fetchQuery(dataQuery(params.tableId)),
+    queryClient.fetchQuery(columnsQuery(projectId!, tableId!)),
+    queryClient.fetchQuery(dataQuery(projectId!, tableId!)),
   ])
 }

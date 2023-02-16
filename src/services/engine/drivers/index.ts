@@ -8,14 +8,14 @@ const drivers = {
   POSTGRES: PostgresDriver,
   MYSQL: null,
   MSSQL: null,
-  SQLITE3: null,
+  SQLITE: null,
 } as const
 
 // NOTE memoizing this function so we're not re-creating the driver every time. not sure
 // if this is needed or even the best way to share global state, but it'll do for now!
 const cache = new Map<string, InstanceType<typeof BaseDriver>>()
 
-export const createDriver = (databaseUrl: string): InstanceType<typeof BaseDriver> => {
+export const getDriver = (databaseUrl: string): InstanceType<typeof BaseDriver> => {
   let driver = cache.get(databaseUrl)
 
   if (!driver) {

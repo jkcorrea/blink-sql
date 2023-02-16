@@ -38,10 +38,11 @@ export class ConnectionConfig {
 
     if (type === 'MYSQL2') type = SqlDriverType.MYSQL
     if (type === 'POSTGRESQL') type = SqlDriverType.POSTGRES
+    if (type === 'SQLITE3') type = SqlDriverType.SQLITE
     if (!assertValidDriver(type)) throw new Error(`Invalid database protocol: ${protocol} in ${databaseUrl}`)
 
     let database = parsedUrl.pathname?.replace(/^\//, '').replace(/\/$/, '') ?? ''
-    if (type === SqlDriverType.SQLITE3) {
+    if (type === SqlDriverType.SQLITE) {
       // Assume it's a sqlite file
       database = parsedUrl.hostname
         ? // Relative or just a filename (no pathname)
